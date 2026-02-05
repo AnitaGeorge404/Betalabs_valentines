@@ -19,6 +19,33 @@ function App() {
   const [selectedPerson2, setSelectedPerson2] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isPublic, setIsPublic] = useState(true)
+  const [floatingHearts, setFloatingHearts] = useState([])
+
+  // Generate continuous floating hearts
+  useEffect(() => {
+    const generateHeart = () => ({
+      id: Math.random(),
+      left: Math.random() * 100,
+      delay: Math.random() * 5,
+      duration: 8 + Math.random() * 7,
+      size: 12 + Math.random() * 20,
+      emoji: ['❤️', '💕', '💖', '💗', '💝', '💓', '💞'][Math.floor(Math.random() * 7)],
+      opacity: 0.4 + Math.random() * 0.4
+    })
+
+    // Initial hearts
+    setFloatingHearts(Array.from({ length: 30 }, generateHeart))
+
+    // Add new hearts periodically
+    const interval = setInterval(() => {
+      setFloatingHearts(prev => {
+        if (prev.length < 40) return [...prev, generateHeart()]
+        return prev
+      })
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Mock data
   const onboardingSteps = [
@@ -76,31 +103,85 @@ function App() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen flex items-center justify-center p-6"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
     >
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-[3rem] shadow-pink p-12 max-w-md w-full"
-      >
-        {/* Decorative Hearts */}
-        <div className="text-center mb-8">
+      {/* Animated Background Hearts */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(8)].map((_, i) => (
           <motion.div
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, 5, -5, 0]
+            key={i}
+            className="absolute"
+            initial={{ 
+              x: Math.random() * window.innerWidth,
+              y: -50,
+              opacity: 0
             }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="inline-block"
+            animate={{
+              y: window.innerHeight + 50,
+              opacity: [0, 0.3, 0.3, 0],
+              rotate: [0, 360]
+            }}
+            transition={{
+              duration: 15 + i * 2,
+              repeat: Infinity,
+              delay: i * 2,
+              ease: "linear"
+            }}
           >
             <Heart 
-              strokeWidth={1.2} 
-              fill="currentColor" 
-              className="w-20 h-20 text-deep-crimson mx-auto mb-4" 
+              className="text-deep-crimson" 
+              size={30 + i * 5} 
+              fill="currentColor"
+              opacity={0.1}
             />
           </motion.div>
-          <h1 className="font-script text-5xl text-deep-crimson mb-3">
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ y: 50, opacity: 0, scale: 0.9 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, type: "spring", bounce: 0.4 }}
+        className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink hover:shadow-pink-lg transition-all duration-500 p-6 sm:p-8 md:p-12 max-w-md w-full relative z-10"
+      >
+        {/* Decorative Hearts */}
+        <div className="text-center mb-6 sm:mb-8">
+          <motion.div
+            animate={{ 
+              scale: [1, 1.15, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="inline-block relative"
+          >
+            <Heart 
+              strokeWidth={0} 
+              fill="currentColor" 
+              className="w-16 h-16 sm:w-20 sm:h-20 text-deep-crimson mx-auto mb-4 drop-shadow-lg" 
+            />
+            {/* Sparkle effects around heart */}
+            <motion.div
+              className="absolute -top-2 -right-2"
+              animate={{ 
+                scale: [0, 1, 0],
+                rotate: [0, 180, 360]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-soft-red" fill="currentColor" />
+            </motion.div>
+            <motion.div
+              className="absolute -bottom-2 -left-2"
+              animate={{ 
+                scale: [0, 1, 0],
+                rotate: [360, 180, 0]
+              }}
+              transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+            >
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-soft-red" fill="currentColor" />
+            </motion.div>
+          </motion.div>
+          <h1 className="font-script text-4xl sm:text-5xl text-deep-crimson mb-3">
             Cupid's Ledger
           </h1>
           <p className="text-charcoal/70 font-sans text-sm">
@@ -110,12 +191,27 @@ function App() {
 
         {/* Google Auth Button */}
         <motion.button
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.03, y: -3, boxShadow: "0 20px 50px rgba(255, 182, 193, 0.4)" }}
+          whileTap={{ scale: 0.97 }}
+          animate={{
+            boxShadow: [
+              "0 10px 30px rgba(255, 182, 193, 0.15)",
+              "0 15px 40px rgba(255, 182, 193, 0.25)",
+              "0 10px 30px rgba(255, 182, 193, 0.15)"
+            ]
+          }}
+          transition={{
+            boxShadow: { duration: 2.5, repeat: Infinity, ease: "easeInOut" }
+          }}
           onClick={() => setCurrentPage('onboarding')}
           className="w-full bg-white border-2 border-pink-shadow/30 rounded-2xl p-4 flex items-center justify-center gap-3 hover:border-soft-red hover:shadow-elegant transition-all"
         >
-          <Mail strokeWidth={1.2} className="w-5 h-5 text-deep-crimson" />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <Mail strokeWidth={1.2} className="w-5 h-5 text-deep-crimson" />
+          </motion.div>
           <span className="font-sans font-semibold text-charcoal">
             Continue with College Email
           </span>
@@ -138,6 +234,7 @@ function App() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        className="relative"
         className="min-h-screen flex items-center justify-center p-6"
       >
         <motion.div
@@ -250,117 +347,159 @@ function App() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen flex items-center justify-center p-6"
+        className="min-h-screen flex items-center justify-center p-4 sm:p-6"
       >
         <motion.div
           key={currentQuizQuestion}
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          className="bg-white rounded-[3rem] shadow-pink p-12 max-w-3xl w-full"
+          initial={{ x: 100, opacity: 0, scale: 0.95 }}
+          animate={{ x: 0, opacity: 1, scale: 1 }}
+          exit={{ x: -100, opacity: 0, scale: 0.95 }}
+          transition={{ type: "spring", bounce: 0.3 }}
+          className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink hover:shadow-pink-lg transition-all duration-500 p-6 sm:p-8 md:p-12 max-w-3xl w-full"
         >
           {/* Progress */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-sans text-charcoal/60">
+              <span className="text-xs sm:text-sm font-sans text-charcoal/60">
                 Question {currentQuizQuestion + 1} of {quizQuestions.length}
               </span>
-              <span className="text-sm font-sans font-semibold text-deep-crimson">
+              <span className="text-xs sm:text-sm font-sans font-semibold text-deep-crimson">
                 {Math.round(((currentQuizQuestion + 1) / quizQuestions.length) * 100)}%
               </span>
             </div>
-            <div className="h-2 bg-pink-shadow/20 rounded-full overflow-hidden">
+            <div className="h-2 bg-pink-shadow/20 rounded-full overflow-hidden relative">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ 
                   width: `${((currentQuizQuestion + 1) / quizQuestions.length) * 100}%` 
                 }}
-                className="h-full bg-gradient-to-r from-deep-crimson to-soft-red"
-              />
+                className="h-full bg-gradient-to-r from-deep-crimson to-soft-red relative"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-white/30"
+                  animate={{
+                    x: ['-100%', '100%']
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+              </motion.div>
             </div>
           </div>
 
           {/* Question */}
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl text-deep-crimson mb-8">
-              {question.question}
-            </h2>
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-12"
+            >
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-deep-crimson mb-6 leading-relaxed px-4">
+                {question.question}
+              </h2>
+            </motion.div>
 
-            {/* Rating Display */}
-            <div className="mb-8">
+            {/* Slider with Heart Thumb */}
+            <style>{`
+              .heart-slider::-webkit-slider-thumb {
+                appearance: none;
+                width: 40px;
+                height: 40px;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23DC143C'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                cursor: pointer;
+                filter: drop-shadow(0 4px 10px rgba(220, 20, 60, 0.5));
+                transition: all 0.2s ease;
+              }
+              
+              .heart-slider::-webkit-slider-thumb:hover {
+                transform: scale(1.2) rotate(5deg);
+                filter: drop-shadow(0 6px 15px rgba(220, 20, 60, 0.7));
+              }
+              
+              .heart-slider::-webkit-slider-thumb:active {
+                transform: scale(1.15) rotate(-5deg);
+              }
+              
+              .heart-slider::-moz-range-thumb {
+                width: 40px;
+                height: 40px;
+                border: none;
+                background-color: transparent;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23DC143C'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                cursor: pointer;
+                filter: drop-shadow(0 4px 10px rgba(220, 20, 60, 0.5));
+                transition: all 0.2s ease;
+              }
+              
+              .heart-slider::-moz-range-thumb:hover {
+                transform: scale(1.2) rotate(5deg);
+                filter: drop-shadow(0 6px 15px rgba(220, 20, 60, 0.7));
+              }
+              
+              .heart-slider::-webkit-slider-runnable-track {
+                height: 12px;
+                border-radius: 999px;
+              }
+              
+              .heart-slider::-moz-range-track {
+                height: 12px;
+                border-radius: 999px;
+              }
+            `}</style>
+            <div className="max-w-2xl mx-auto px-4 sm:px-6">
               <motion.div
-                key={currentAnswer}
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                className="inline-flex items-center gap-3 bg-gradient-to-r from-deep-crimson/10 to-soft-red/10 rounded-3xl px-8 py-4"
+                whileHover={{ scale: 1.01 }}
+                className="relative"
               >
-                {[...Array(currentAnswer)].map((_, i) => (
-                  <Heart
-                    key={i}
-                    strokeWidth={1.2}
-                    fill="currentColor"
-                    className="w-6 h-6 text-soft-red"
-                  />
-                ))}
-                <span className="font-serif text-4xl font-bold text-deep-crimson ml-2">
-                  {currentAnswer}
-                </span>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={currentAnswer}
+                  onChange={(e) => handleRatingChange(parseInt(e.target.value))}
+                  className="heart-slider w-full h-3 bg-gradient-to-r from-pink-shadow/30 via-pink-shadow/40 to-soft-red/50 rounded-full appearance-none cursor-pointer shadow-inner"
+                />
               </motion.div>
-              <p className="text-sm text-charcoal/60 font-sans mt-4">
-                Rate out of 10
-              </p>
-            </div>
-
-            {/* Slider */}
-            <div className="max-w-md mx-auto">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={currentAnswer}
-                onChange={(e) => handleRatingChange(parseInt(e.target.value))}
-                className="w-full h-2 bg-pink-shadow/20 rounded-full appearance-none cursor-pointer
-                  [&::-webkit-slider-thumb]:appearance-none 
-                  [&::-webkit-slider-thumb]:w-6 
-                  [&::-webkit-slider-thumb]:h-6 
-                  [&::-webkit-slider-thumb]:rounded-full 
-                  [&::-webkit-slider-thumb]:bg-deep-crimson
-                  [&::-webkit-slider-thumb]:shadow-elegant
-                  [&::-webkit-slider-thumb]:cursor-pointer
-                  [&::-moz-range-thumb]:w-6 
-                  [&::-moz-range-thumb]:h-6 
-                  [&::-moz-range-thumb]:rounded-full 
-                  [&::-moz-range-thumb]:bg-deep-crimson
-                  [&::-moz-range-thumb]:border-0
-                  [&::-moz-range-thumb]:shadow-elegant
-                  [&::-moz-range-thumb]:cursor-pointer"
-              />
-              <div className="flex justify-between mt-2">
-                <span className="text-xs font-sans text-charcoal/50">1</span>
-                <span className="text-xs font-sans text-charcoal/50">10</span>
+              <div className="flex justify-between mt-4 px-2">
+                <span className="text-sm font-sans font-semibold text-charcoal/60">1 - Low</span>
+                <span className="text-sm font-sans font-semibold text-charcoal/60">10 - High</span>
               </div>
             </div>
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center pt-6 border-t border-pink-shadow/10">
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, x: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={handlePrev}
               disabled={currentQuizQuestion === 0}
-              className="bg-white border-2 border-pink-shadow/30 rounded-full p-3 hover:border-soft-red transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="bg-white border-2 border-pink-shadow/30 rounded-full p-4 hover:border-soft-red hover:shadow-elegant transition-all disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              <ChevronLeft strokeWidth={1.2} className="w-5 h-5 text-charcoal" />
+              <ChevronLeft strokeWidth={2} className="w-5 h-5 text-charcoal" />
             </motion.button>
 
+            <div className="text-center">
+              <p className="text-xs font-sans text-charcoal/50 mb-1">Question {currentQuizQuestion + 1} of {quizQuestions.length}</p>
+            </div>
+
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, x: 2, boxShadow: "0 10px 30px rgba(220, 20, 60, 0.3)" }}
               whileTap={{ scale: 0.95 }}
               onClick={handleNext}
-              className="bg-deep-crimson text-white rounded-2xl px-8 py-3 font-sans font-semibold shadow-elegant flex items-center gap-2"
+              className="bg-deep-crimson text-white rounded-full px-8 py-4 font-sans font-semibold shadow-elegant flex items-center gap-2 hover:bg-soft-red transition-all"
             >
               {currentQuizQuestion < quizQuestions.length - 1 ? 'Next' : 'Finish'}
-              <ChevronRight strokeWidth={1.2} className="w-5 h-5" />
+              <ChevronRight strokeWidth={2} className="w-5 h-5" />
             </motion.button>
           </div>
         </motion.div>
@@ -432,8 +571,20 @@ function App() {
 
               {selectedPerson1 && selectedPerson2 && (
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.08, boxShadow: "0 15px 40px rgba(220, 20, 60, 0.4)" }}
                   whileTap={{ scale: 0.95 }}
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    boxShadow: [
+                      "0 10px 30px rgba(220, 20, 60, 0.3)",
+                      "0 15px 40px rgba(220, 20, 60, 0.4)",
+                      "0 10px 30px rgba(220, 20, 60, 0.3)"
+                    ]
+                  }}
+                  transition={{
+                    scale: { duration: 2, repeat: Infinity },
+                    boxShadow: { duration: 2, repeat: Infinity }
+                  }}
                   onClick={() => {
                     // Match animation
                     setTimeout(() => {
@@ -441,8 +592,9 @@ function App() {
                       setSelectedPerson2(null)
                     }, 1000)
                   }}
-                  className="ml-auto bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans font-semibold shadow-elegant"
+                  className="ml-auto bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans font-semibold shadow-elegant flex items-center gap-2"
                 >
+                  <Heart strokeWidth={1.2} fill="currentColor" className="w-4 h-4" />
                   Match!
                 </motion.button>
               )}
@@ -451,16 +603,23 @@ function App() {
         </div>
 
         {/* Students List */}
-        <div className="bg-white rounded-3xl shadow-elegant p-6">
-          <h3 className="font-serif text-xl text-deep-crimson mb-4">
+        <div className="bg-white rounded-3xl shadow-elegant p-4 sm:p-6">
+          <h3 className="font-serif text-lg sm:text-xl text-deep-crimson mb-4">
             Select Students
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
-            {filteredStudents.map((student) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 max-h-96 overflow-y-auto pr-2">
+            {filteredStudents.map((student, index) => (
               <motion.button
                 key={student}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.02 }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -5,
+                  boxShadow: "0 15px 35px rgba(255, 182, 193, 0.4)"
+                }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   if (!selectedPerson1) {
                     setSelectedPerson1(student)
@@ -469,27 +628,68 @@ function App() {
                   }
                 }}
                 disabled={student === selectedPerson1 || student === selectedPerson2}
-                className={`p-4 rounded-2xl border-2 transition-all font-sans text-sm ${
+                className={`p-3 sm:p-4 rounded-2xl border-2 transition-all font-sans text-xs sm:text-sm relative overflow-hidden ${
                   student === selectedPerson1 || student === selectedPerson2
                     ? 'bg-gradient-to-br from-deep-crimson/10 to-soft-red/10 border-soft-red'
-                    : 'border-pink-shadow/20 hover:border-soft-red'
+                    : 'border-pink-shadow/20 hover:border-soft-red bg-white'
                 } disabled:cursor-not-allowed`}
               >
-                <div className="w-10 h-10 rounded-full bg-pink-shadow/20 mx-auto mb-2 flex items-center justify-center">
-                  <User strokeWidth={1.2} size={18} className="text-charcoal" />
+                {/* Sparkle effect on hover */}
+                {(student === selectedPerson1 || student === selectedPerson2) && (
+                  <motion.div
+                    className="absolute top-1 right-1"
+                    animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Sparkles className="w-3 h-3 text-soft-red" fill="currentColor" />
+                  </motion.div>
+                )}
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-pink-shadow/20 mx-auto mb-2 flex items-center justify-center">
+                  <User strokeWidth={1.2} size={16} className="text-charcoal sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-charcoal font-semibold truncate">{student}</p>
+                <p className="text-charcoal font-semibold truncate text-xs sm:text-sm">{student}</p>
               </motion.button>
             ))}
           </div>
         </div>
 
         {/* Fun Message */}
-        <div className="bg-gradient-to-r from-deep-crimson/5 to-soft-red/5 rounded-3xl p-6 text-center">
-          <Sparkles strokeWidth={1.2} className="w-8 h-8 text-soft-red mx-auto mb-3" />
-          <p className="font-script text-2xl text-deep-crimson mb-2">Boring day?</p>
-          <p className="text-sm text-charcoal/60 font-sans">Create some matches and spice things up!</p>
-        </div>
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          className="bg-gradient-to-r from-deep-crimson/5 to-soft-red/5 rounded-3xl p-6 text-center relative overflow-hidden"
+        >
+          {/* Floating hearts in background */}
+          <div className="absolute inset-0 pointer-events-none">
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute"
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ 
+                  y: -100, 
+                  opacity: [0, 0.2, 0],
+                  x: [0, 20, -20, 0]
+                }}
+                transition={{
+                  duration: 4 + i,
+                  repeat: Infinity,
+                  delay: i * 1.5
+                }}
+                style={{ left: `${20 + i * 30}%` }}
+              >
+                <Heart className="text-soft-red" size={20} fill="currentColor" opacity={0.2} />
+              </motion.div>
+            ))}
+          </div>
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <Sparkles strokeWidth={1.2} className="w-6 h-6 sm:w-8 sm:h-8 text-soft-red mx-auto mb-3" />
+          </motion.div>
+          <p className="font-script text-xl sm:text-2xl text-deep-crimson mb-2">Boring day?</p>
+          <p className="text-xs sm:text-sm text-charcoal/60 font-sans">Create some matches and spice things up!</p>
+        </motion.div>
       </div>
     )
 
@@ -497,39 +697,77 @@ function App() {
     const Leaderboard = () => (
       <div className="space-y-6">
         {/* Top Match Finders */}
-        <div className="bg-white rounded-3xl shadow-elegant p-8">
-          <div className="text-center mb-8">
-            <Trophy strokeWidth={1.2} className="w-12 h-12 text-deep-crimson mx-auto mb-3" />
-            <h3 className="font-serif text-3xl text-deep-crimson mb-2">Best Match Finders</h3>
-            <p className="text-charcoal/60 font-sans text-sm">Top matchmakers on campus</p>
+        <div className="bg-white rounded-3xl shadow-elegant p-6 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <motion.div
+              animate={{ 
+                rotate: [0, -10, 10, 0],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="inline-block"
+            >
+              <Trophy strokeWidth={1.2} className="w-10 h-10 sm:w-12 sm:h-12 text-deep-crimson mx-auto mb-3" />
+            </motion.div>
+            <h3 className="font-serif text-2xl sm:text-3xl text-deep-crimson mb-2">Best Match Finders</h3>
+            <p className="text-charcoal/60 font-sans text-xs sm:text-sm">Top matchmakers on campus</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            {leaderboardData.map((player) => {
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {leaderboardData.map((player, index) => {
               const borderColors = {
                 1: 'border-rose-400',
                 2: 'border-rose-300',
                 3: 'border-pink-300'
               }
+              const icons = {
+                1: Crown,
+                2: Award,
+                3: Medal
+              }
+              const Icon = icons[player.rank]
               
               return (
                 <motion.div
                   key={player.rank}
-                  whileHover={{ y: -4 }}
-                  className={`bg-white rounded-2xl border-4 ${borderColors[player.rank]} p-6 text-center`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ 
+                    y: -8,
+                    boxShadow: "0 20px 50px rgba(255, 182, 193, 0.4)"
+                  }}
+                  className={`bg-white rounded-2xl border-4 ${borderColors[player.rank]} p-6 text-center relative overflow-hidden`}
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">#{player.rank}</span>
-                  </div>
-                  <h4 className="font-script text-xl text-deep-crimson mb-4">{player.name}</h4>
+                  {/* Animated crown for #1 */}
+                  {player.rank === 1 && (
+                    <motion.div
+                      className="absolute top-2 right-2"
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.2, 1]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Sparkles className="w-5 h-5 text-rose-400" fill="currentColor" />
+                    </motion.div>
+                  )}
+                  <motion.div 
+                    className="w-12 h-12 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red mx-auto mb-4 flex items-center justify-center"
+                    animate={player.rank === 1 ? { scale: [1, 1.1, 1] } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Icon className="w-6 h-6 text-white" strokeWidth={2} />
+                  </motion.div>
+                  <h4 className="font-script text-lg sm:text-xl text-deep-crimson mb-4">{player.name}</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-charcoal/60 font-sans text-sm">Points</span>
-                      <span className="text-charcoal font-bold">{player.points}</span>
+                      <span className="text-charcoal/60 font-sans text-xs sm:text-sm">Points</span>
+                      <span className="text-charcoal font-bold text-sm sm:text-base">{player.points}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-charcoal/60 font-sans text-sm">Matches</span>
-                      <span className="text-charcoal font-bold">{player.matches}</span>
+                      <span className="text-charcoal/60 font-sans text-xs sm:text-sm">Matches</span>
+                      <span className="text-charcoal font-bold text-sm sm:text-base">{player.matches}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -539,17 +777,34 @@ function App() {
         </div>
 
         {/* Most Matched Couples */}
-        <div className="bg-white rounded-3xl shadow-elegant p-8">
-          <div className="text-center mb-8">
-            <Flame strokeWidth={1.2} className="w-12 h-12 text-soft-red mx-auto mb-3" />
-            <h3 className="font-serif text-3xl text-deep-crimson mb-2">Most Matched Couples</h3>
-            <p className="text-charcoal/60 font-sans text-sm">Couples matched by majority</p>
+        <div className="bg-white rounded-3xl shadow-elegant p-6 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <motion.div
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="inline-block"
+            >
+              <Flame strokeWidth={1.2} className="w-10 h-10 sm:w-12 sm:h-12 text-soft-red mx-auto mb-3" />
+            </motion.div>
+            <h3 className="font-serif text-2xl sm:text-3xl text-deep-crimson mb-2">Most Matched Couples</h3>
+            <p className="text-charcoal/60 font-sans text-xs sm:text-sm">Couples matched by majority</p>
           </div>
 
           <div className="space-y-4">
             {topCouples.map((couple, index) => (
               <motion.div
                 key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.02,
+                  x: 5,
+                  boxShadow: "0 15px 40px rgba(255, 182, 193, 0.3)"
+                }}
                 whileHover={{ scale: 1.02 }}
                 className="bg-gradient-to-r from-deep-crimson/5 to-soft-red/5 rounded-2xl p-6 flex items-center gap-4"
               >
@@ -657,19 +912,49 @@ function App() {
           {/* Stats */}
           <div className="border-t border-pink-shadow/20 pt-6 mt-6">
             <h4 className="font-serif text-xl text-deep-crimson mb-4">Your Stats</h4>
-            <div className="grid grid-cols-3 gap-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-deep-crimson font-serif">1,245</p>
-                <p className="text-sm text-charcoal/60 mt-1 font-sans">Points</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-deep-crimson font-serif">50</p>
-                <p className="text-sm text-charcoal/60 mt-1 font-sans">Matches</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-deep-crimson font-serif">#12</p>
-                <p className="text-sm text-charcoal/60 mt-1 font-sans">Rank</p>
-              </div>
+            <div className="grid grid-cols-3 gap-4 sm:gap-6">
+              <motion.div 
+                className="text-center bg-gradient-to-br from-deep-crimson/5 to-soft-red/5 rounded-2xl p-4"
+                whileHover={{ scale: 1.05, y: -5 }}
+              >
+                <motion.p 
+                  className="text-2xl sm:text-3xl font-bold text-deep-crimson font-serif"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", delay: 0.2 }}
+                >
+                  1,245
+                </motion.p>
+                <p className="text-xs sm:text-sm text-charcoal/60 mt-1 font-sans">Points</p>
+              </motion.div>
+              <motion.div 
+                className="text-center bg-gradient-to-br from-deep-crimson/5 to-soft-red/5 rounded-2xl p-4"
+                whileHover={{ scale: 1.05, y: -5 }}
+              >
+                <motion.p 
+                  className="text-2xl sm:text-3xl font-bold text-deep-crimson font-serif"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", delay: 0.3 }}
+                >
+                  50
+                </motion.p>
+                <p className="text-xs sm:text-sm text-charcoal/60 mt-1 font-sans">Matches</p>
+              </motion.div>
+              <motion.div 
+                className="text-center bg-gradient-to-br from-deep-crimson/5 to-soft-red/5 rounded-2xl p-4"
+                whileHover={{ scale: 1.05, y: -5 }}
+              >
+                <motion.p 
+                  className="text-2xl sm:text-3xl font-bold text-deep-crimson font-serif"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", delay: 0.4 }}
+                >
+                  #12
+                </motion.p>
+                <p className="text-xs sm:text-sm text-charcoal/60 mt-1 font-sans">Rank</p>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -677,21 +962,37 @@ function App() {
     )
 
     return (
-      <div className="min-h-screen pb-24">
+      <div className="min-h-screen pb-20 sm:pb-24">
         {/* Header */}
-        <div className="bg-white shadow-sm sticky top-0 z-10 border-b border-pink-shadow/10">
-          <div className="max-w-7xl mx-auto px-6 py-4">
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-white shadow-sm sticky top-0 z-20 border-b border-pink-shadow/10 backdrop-blur-lg bg-white/95"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Heart strokeWidth={1.2} fill="currentColor" className="w-8 h-8 text-deep-crimson" />
-                <h1 className="font-script text-3xl text-deep-crimson">Cupid's Ledger</h1>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.15, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Heart strokeWidth={0} fill="currentColor" className="w-6 h-6 sm:w-8 sm:h-8 text-deep-crimson" />
+                </motion.div>
+                <h1 className="font-script text-2xl sm:text-3xl text-deep-crimson">Cupid's Ledger</h1>
               </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center cursor-pointer">
-                <User strokeWidth={1.2} size={20} className="text-white" />
-              </div>
+              <motion.div 
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center cursor-pointer shadow-elegant"
+              >
+                <User strokeWidth={1.2} size={18} className="text-white sm:w-5 sm:h-5" />
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Content */}
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -703,9 +1004,14 @@ function App() {
         </div>
 
         {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-pink-shadow/20 shadow-elegant">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex justify-around py-4">
+        <motion.div 
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          transition={{ type: "spring", bounce: 0.3 }}
+          className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-pink-shadow/20 shadow-elegant z-20"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="flex justify-around py-3 sm:py-4">
               {[
                 { id: 'match', icon: Search, label: 'Find Match' },
                 { id: 'leaderboard', icon: Trophy, label: 'Leaderboard' },
@@ -717,18 +1023,32 @@ function App() {
                 return (
                   <motion.button
                     key={tab.id}
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setMainTab(tab.id)}
-                    className={`flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-all ${
-                      isActive ? 'bg-deep-crimson' : ''
-                    }`}
+                    className="relative flex flex-col items-center gap-1 px-4 sm:px-6 py-2 rounded-2xl transition-all"
                   >
-                    <Icon 
-                      strokeWidth={1.2} 
-                      className={`w-6 h-6 ${isActive ? 'text-white' : 'text-charcoal/60'}`} 
-                    />
-                    <span className={`text-xs font-sans font-semibold ${
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabIndicator"
+                        className="absolute inset-0 bg-deep-crimson rounded-2xl"
+                        transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+                      />
+                    )}
+                    <motion.div
+                      animate={isActive ? { 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 5, -5, 0]
+                      } : {}}
+                      transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
+                      className="relative z-10"
+                    >
+                      <Icon 
+                        strokeWidth={1.2} 
+                        className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? 'text-white' : 'text-charcoal/60'}`} 
+                      />
+                    </motion.div>
+                    <span className={`text-[10px] sm:text-xs font-sans font-semibold relative z-10 ${
                       isActive ? 'text-white' : 'text-charcoal/60'
                     }`}>
                       {tab.label}
@@ -738,19 +1058,77 @@ function App() {
               })}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen">
-      <AnimatePresence mode="wait">
-        {currentPage === 'auth' && <AuthPage key="auth" />}
-        {currentPage === 'onboarding' && <OnboardingPage key="onboarding" />}
-        {currentPage === 'quiz' && <QuizPage key="quiz" />}
-        {currentPage === 'main' && <MainApp key="main" />}
-      </AnimatePresence>
+    <div className="min-h-screen bg-light-pink relative overflow-hidden">
+      {/* Continuous Floating Hearts Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {floatingHearts.map(heart => (
+          <motion.div
+            key={heart.id}
+            className="absolute"
+            initial={{ 
+              left: `${heart.left}%`,
+              bottom: -50,
+              opacity: 0,
+              rotate: 0
+            }}
+            animate={{ 
+              y: typeof window !== 'undefined' ? -(window.innerHeight + 100) : -1000,
+              opacity: [0, heart.opacity, heart.opacity, 0],
+              rotate: [0, 180, 360],
+              x: [0, 30, -30, 0]
+            }}
+            transition={{
+              duration: heart.duration,
+              delay: heart.delay,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            style={{ fontSize: `${heart.size}px` }}
+          >
+            {heart.emoji}
+          </motion.div>
+        ))}
+        {/* Sparkle dust */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={`sparkle-${i}`}
+            className="absolute"
+            initial={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              scale: 0
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              rotate: [0, 180, 360],
+              opacity: [0, 0.8, 0]
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: i * 0.2
+            }}
+          >
+            <Sparkles className="text-soft-red" size={10 + Math.random() * 8} />
+          </motion.div>
+        ))}
+      </div>
+      
+      {/* Main Content */}
+      <div className="relative z-10">
+        <AnimatePresence mode="wait">
+          {currentPage === 'auth' && <AuthPage key="auth" />}
+          {currentPage === 'onboarding' && <OnboardingPage key="onboarding" />}
+          {currentPage === 'quiz' && <QuizPage key="quiz" />}
+          {currentPage === 'main' && <MainApp key="main" />}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
