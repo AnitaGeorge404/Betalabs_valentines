@@ -1,59 +1,118 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Trophy, Search, User, Sparkles, Lock, Crown, Zap, TrendingUp, Star, ChevronRight, ChevronLeft, Flame, Award } from 'lucide-react'
+import { 
+  Heart, Trophy, Search, User, Sparkles, Crown, Flame, 
+  ChevronRight, ChevronLeft, Award, TrendingUp, Check, 
+  Coffee, Music, Pizza, Book, Mountain, Palmtree, Home, 
+  MessageCircle, Timer, Sunrise, Moon, Dog, Cat, Bird, X,
+  Star, Zap, Eye, EyeOff, Medal
+} from 'lucide-react'
 import './App.css'
 
-// Questionnaire Data
+// Questionnaire Data with Lucide Icons
 const questions = [
   {
     id: 1,
     question: "Pineapple on pizza: Dealbreaker or Love language?",
-    options: ["Absolute dealbreaker! 🚫", "Love language! 🍍", "I'm Switzerland 🤷"]
+    icon: Pizza,
+    options: [
+      { text: "Absolute dealbreaker!", icon: X },
+      { text: "Love language!", icon: Heart },
+      { text: "I'm Switzerland", icon: Check }
+    ]
   },
   {
     id: 2,
     question: "Are you an Early bird or Night owl?",
-    options: ["Early bird 🌅", "Night owl 🦉", "Whenever the vibe hits ✨"]
+    icon: Sparkles,
+    options: [
+      { text: "Early bird", icon: Sunrise },
+      { text: "Night owl", icon: Moon },
+      { text: "Whenever the vibe hits", icon: Zap }
+    ]
   },
   {
     id: 3,
     question: "First date: Library or Beach?",
-    options: ["Library vibes 📚", "Beach vibes 🏖️", "Coffee shop compromise ☕"]
+    icon: Heart,
+    options: [
+      { text: "Library vibes", icon: Book },
+      { text: "Beach vibes", icon: Palmtree },
+      { text: "Coffee shop compromise", icon: Coffee }
+    ]
   },
   {
     id: 4,
     question: "Your go-to Friday night?",
-    options: ["Party hard 🎉", "Netflix & chill 🎬", "Dinner with close friends 🍽️"]
+    icon: Star,
+    options: [
+      { text: "Party hard", icon: Music },
+      { text: "Netflix & chill", icon: Home },
+      { text: "Dinner with close friends", icon: Heart }
+    ]
   },
   {
     id: 5,
     question: "Love language preference?",
-    options: ["Words of affirmation 💬", "Physical touch 🤗", "Quality time ⏰", "Acts of service 🎁"]
+    icon: Heart,
+    options: [
+      { text: "Words of affirmation", icon: MessageCircle },
+      { text: "Physical touch", icon: Heart },
+      { text: "Quality time", icon: Timer },
+      { text: "Acts of service", icon: Star }
+    ]
   },
   {
     id: 6,
     question: "Texting style?",
-    options: ["Essay writer 📝", "One-word wonder 👍", "Emoji enthusiast 😊"]
+    icon: MessageCircle,
+    options: [
+      { text: "Essay writer", icon: Book },
+      { text: "One-word wonder", icon: Zap },
+      { text: "Heart emoji enthusiast", icon: Heart }
+    ]
   },
   {
     id: 7,
     question: "Dream vacation?",
-    options: ["Adventure sports 🏔️", "Cultural exploration 🏛️", "Beach resort 🏝️", "Staycation 🏠"]
+    icon: Sparkles,
+    options: [
+      { text: "Adventure sports", icon: Mountain },
+      { text: "Cultural exploration", icon: Book },
+      { text: "Beach resort", icon: Palmtree },
+      { text: "Staycation", icon: Home }
+    ]
   },
   {
     id: 8,
     question: "How do you handle conflicts?",
-    options: ["Talk it out immediately 💬", "Need space first 🚶", "Avoid at all costs 🙈"]
+    icon: MessageCircle,
+    options: [
+      { text: "Talk it out immediately", icon: MessageCircle },
+      { text: "Need space first", icon: Moon },
+      { text: "Avoid at all costs", icon: X }
+    ]
   },
   {
     id: 9,
     question: "Your ideal Saturday morning?",
-    options: ["Sleep in till noon 😴", "Early workout 💪", "Brunch with friends 🥞"]
+    icon: Sunrise,
+    options: [
+      { text: "Sleep in till noon", icon: Moon },
+      { text: "Early workout", icon: Zap },
+      { text: "Brunch with friends", icon: Coffee }
+    ]
   },
   {
     id: 10,
     question: "Pet preference?",
-    options: ["Dog person 🐕", "Cat person 🐱", "All animals! 🦜", "No pets 🚫"]
+    icon: Heart,
+    options: [
+      { text: "Dog person", icon: Dog },
+      { text: "Cat person", icon: Cat },
+      { text: "All animals!", icon: Bird },
+      { text: "No pets", icon: X }
+    ]
   }
 ]
 
@@ -242,11 +301,10 @@ function App() {
                     scale: [1, 1.1, 1]
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative"
                 >
-                  <Heart className="fill-deep-crimson text-deep-crimson w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 drop-shadow-[0_0_15px_rgba(208,0,0,0.6)]" />
+                  <Heart fill="currentColor" strokeWidth={0} className="text-hot-pink w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20" />
                 </motion.div>
-                <h1 className="font-script text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-deep-crimson tracking-wide drop-shadow-[0_2px_10px_rgba(208,0,0,0.3)]">
+                <h1 className="font-script text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-soft-crimson tracking-wide">
                   Cupid's Ledger
                 </h1>
                 <motion.div
@@ -255,40 +313,44 @@ function App() {
                     scale: [1, 1.1, 1]
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-                  className="relative"
                 >
-                  <Heart className="fill-deep-crimson text-deep-crimson w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 drop-shadow-[0_0_15px_rgba(208,0,0,0.6)]" />
+                  <Heart fill="currentColor" strokeWidth={0} className="text-hot-pink w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20" />
                 </motion.div>
               </motion.div>
-              <p className="text-deep-crimson text-sm sm:text-base md:text-lg font-sans font-semibold tracking-wide">
-                Where Hearts Find Their Perfect Match 💕✨
+              <p className="text-soft-crimson/80 text-sm sm:text-base md:text-lg font-sans font-medium tracking-wide">
+                Where Hearts Find Their Perfect Match ✨
               </p>
             </div>
 
-            {/* Whimsical Navigation Pills */}
+            {/* Modern Navigation Pills with Smooth Transitions */}
             <div className="flex justify-center gap-3 sm:gap-4 mt-8 sm:mt-12 flex-wrap px-2 sm:px-4">
               {[
-                { id: 'questionnaire', icon: Sparkles, label: "Cupid's Quiz", color: 'from-soft-rose to-blush-pink' },
-                { id: 'dashboard', icon: Heart, label: 'Match Maker', color: 'from-deep-crimson to-soft-rose' },
-                { id: 'leaderboard', icon: Trophy, label: 'Love Experts', color: 'from-blush-pink to-soft-rose' },
-                { id: 'trending', icon: Flame, label: 'Campus Crushes', color: 'from-soft-rose to-deep-crimson' }
+                { id: 'questionnaire', icon: Sparkles, label: "Cupid's Quiz" },
+                { id: 'dashboard', icon: Heart, label: 'Match Maker' },
+                { id: 'leaderboard', icon: Trophy, label: 'Love Experts' },
+                { id: 'trending', icon: Flame, label: 'Campus Crushes' }
               ].map((tab) => {
                 const Icon = tab.icon
                 const isActive = currentView === tab.id
                 return (
                   <motion.button
                     key={tab.id}
-                    whileHover={{ scale: 1.05, y: -3 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.03, y: -2 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => setCurrentView(tab.id)}
-                    className={`relative px-4 sm:px-8 py-3 sm:py-4 rounded-full font-sans text-xs sm:text-sm font-bold transition-all duration-300 shadow-lg ${
-                      isActive
-                        ? `bg-gradient-to-r ${tab.color} text-white animate-gentle-pulse`
-                        : 'enchanted-glass text-deep-crimson hover:shadow-xl'
-                    }`}
+                    className="relative px-4 sm:px-8 py-3 sm:py-4 rounded-full font-sans text-xs sm:text-sm font-semibold transition-colors duration-300"
                   >
-                    <span className="flex items-center gap-2 relative z-10">
-                      <Icon size={18} />
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute inset-0 bg-gradient-to-r from-hot-pink to-soft-crimson rounded-full shadow-rose"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className={`flex items-center gap-2 relative z-10 ${
+                      isActive ? 'text-white' : 'text-soft-crimson'
+                    }`}>
+                      <Icon strokeWidth={1.5} size={18} />
                       <span className="hidden sm:inline">{tab.label}</span>
                     </span>
                   </motion.button>
@@ -381,23 +443,23 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
         exit={{ opacity: 0, scale: 0.9 }}
         className="max-w-2xl mx-auto text-center"
       >
-        <div className="glass-dark rounded-[3rem] p-8 sm:p-12 md:p-16">
+        <div className="frosted-glass-dark rounded-[3rem] p-8 sm:p-12 md:p-16 shadow-rose-lg">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.2, 1] }}
             transition={{ duration: 0.6 }}
             className="mb-8 relative"
           >
-            <Heart strokeWidth={1} className="w-24 h-24 sm:w-32 sm:h-32 mx-auto text-rose-gold" />
+            <Heart strokeWidth={1} fill="currentColor" className="w-24 h-24 sm:w-32 sm:h-32 mx-auto text-soft-crimson" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Heart strokeWidth={1} className="w-24 h-24 sm:w-32 sm:h-32 text-rose-gold blur-2xl opacity-50" />
+              <Heart strokeWidth={1} fill="currentColor" className="w-24 h-24 sm:w-32 sm:h-32 text-soft-crimson blur-2xl opacity-50 animate-glow-pulse" />
             </div>
           </motion.div>
           
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-champagne mb-4">
+          <h2 className="font-script text-3xl sm:text-4xl md:text-5xl text-soft-crimson mb-4">
             Your Heart is Ready
           </h2>
-          <p className="text-champagne/70 text-base sm:text-lg mb-8 font-light">
+          <p className="text-soft-crimson/70 text-base sm:text-lg mb-8 font-sans">
             Time to discover those destined connections
           </p>
           
@@ -405,10 +467,10 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setCurrentView('dashboard')}
-            className="ghost-button px-8 py-4 rounded-full font-light text-lg inline-flex items-center gap-3"
+            className="satin-button px-8 py-4 rounded-full font-sans text-lg inline-flex items-center gap-3"
           >
             Begin Matchmaking
-            <ChevronRight strokeWidth={1.5} size={24} />
+            <ChevronRight strokeWidth={1.5} size={24} className="group-hover:translate-x-1 transition-transform" />
           </motion.button>
         </div>
       </motion.div>
@@ -417,27 +479,29 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
 
   return (
     <motion.div
-      initial={{ opacity: 0, filter: "blur(10px)" }}
-      animate={{ opacity: 1, filter: "blur(0px)" }}
-      exit={{ opacity: 0, filter: "blur(10px)" }}
-      transition={{ duration: 0.8 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.5 }}
       className="max-w-3xl mx-auto"
     >
-      {/* Liquid Progress Bar */}
+      {/* Modern Progress Bar */}
       <div className="mb-8 sm:mb-12">
-        <div className="relative w-full h-2 rounded-full overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10">
+        <div className="relative w-full h-3 rounded-full overflow-hidden frosted-glass">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="liquid-bar h-full bg-gradient-to-r from-rose-gold via-champagne to-rose-gold relative"
-          />
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="h-full bg-gradient-to-r from-hot-pink via-soft-crimson to-hot-pink relative shadow-rose"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-slide-fade-in" />
+          </motion.div>
         </div>
         <div className="flex items-center justify-between mt-4">
-          <p className="text-champagne/50 text-xs sm:text-sm font-light tracking-[0.2em] uppercase">
+          <p className="text-soft-crimson/60 text-xs sm:text-sm font-sans font-semibold tracking-wider uppercase">
             Question {currentQuestion + 1} of {questions.length}
           </p>
-          <p className="text-rose-gold text-sm sm:text-base font-light">
+          <p className="text-soft-crimson text-sm sm:text-base font-sans font-bold">
             {Math.round(progress)}%
           </p>
         </div>
@@ -446,42 +510,45 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
       {/* Question Card */}
       <motion.div
         key={currentQuestion}
-        initial={{ x: 100, opacity: 0, filter: "blur(10px)" }}
-        animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
-        exit={{ x: -100, opacity: 0, filter: "blur(10px)" }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="glass-dark rounded-3xl sm:rounded-[3rem] p-6 sm:p-10 md:p-12 inner-glow"
+        initial={{ x: 100, opacity: 0, scale: 0.95 }}
+        animate={{ x: 0, opacity: 1, scale: 1 }}
+        exit={{ x: -100, opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="frosted-glass rounded-3xl p-6 sm:p-10 md:p-12 shadow-rose-lg"
       >
         <div className="flex items-start justify-between mb-8 sm:mb-12">
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-champagne leading-tight flex-1">
+          <h2 className="font-script text-2xl sm:text-3xl md:text-4xl text-soft-crimson leading-tight flex-1">
             {question.question}
           </h2>
-          <Sparkles strokeWidth={1.5} className="text-rose-gold w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 ml-4" />
+          {question.icon && <question.icon strokeWidth={1.5} className="text-soft-crimson w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 ml-4" />}
         </div>
 
         {/* Options */}
         <div className="grid gap-4 sm:gap-5">
-          {question.options.map((option, index) => (
-            <motion.button
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02, x: 8 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleAnswer(option)}
-              className="group relative glass-dark hover:bg-white/5 border border-transparent hover:border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-left transition-all duration-500"
-            >
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-rose-gold/30 group-hover:border-rose-gold flex items-center justify-center font-light text-champagne/70 group-hover:text-champagne text-sm sm:text-base flex-shrink-0 transition-all">
-                  {String.fromCharCode(65 + index)}
+          {question.options.map((optionObj, index) => {
+            const OptionIcon = optionObj.icon
+            return (
+              <motion.button
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02, x: 8 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleAnswer(optionObj.text)}
+                className="group relative frosted-glass hover:bg-white/60 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-left transition-all duration-300 shadow-rose hover:shadow-rose-lg"
+              >
+                <div className="relative z-10 flex items-center gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center text-white flex-shrink-0 shadow-rose">
+                    <OptionIcon strokeWidth={1.5} size={20} />
+                  </div>
+                  <span className="text-soft-crimson font-sans text-base sm:text-lg md:text-xl font-medium transition-colors">
+                    {optionObj.text}
+                  </span>
                 </div>
-                <span className="text-champagne/70 group-hover:text-champagne font-light text-base sm:text-lg md:text-xl transition-colors">
-                  {option}
-                </span>
-              </div>
-            </motion.button>
-          ))}
+              </motion.button>
+            )
+          })}
         </div>
 
         {/* Navigation */}
@@ -491,33 +558,24 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
             whileTap={{ scale: 0.95 }}
             onClick={handlePrevious}
             disabled={currentQuestion === 0}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full font-light transition-all text-sm sm:text-base ${
+            className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full font-sans text-sm sm:text-base transition-all ${
               currentQuestion === 0
-                ? 'opacity-20 cursor-not-allowed text-champagne/30'
-                : 'text-champagne/70 hover:text-champagne ghost-button'
+                ? 'opacity-30 cursor-not-allowed text-soft-crimson/30'
+                : 'text-soft-crimson frosted-glass hover:shadow-rose'
             }`}
           >
             <ChevronLeft strokeWidth={1.5} size={20} />
             <span className="hidden sm:inline">Previous</span>
           </motion.button>
 
-          <div className="flex gap-2">
-            {questions.map((_, index) => (
-              <motion.div
-                key={index}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  index === currentQuestion ? 'w-8 bg-rose-gold shadow-[0_0_10px_rgba(183,110,121,0.5)]' : 
-                  index < currentQuestion ? 'w-1.5 bg-rose-gold/50' : 
-                  'w-1.5 bg-white/10'
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="w-24 sm:w-32"></div>
+          <motion.div
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex items-center gap-2 text-soft-crimson/60 text-xs sm:text-sm"
+          >
+            <Heart strokeWidth={1.5} size={16} fill="currentColor" />
+            <span className="hidden sm:inline font-sans">Keep going!</span>
+          </motion.div>
         </div>
       </motion.div>
     </motion.div>
@@ -795,12 +853,12 @@ function ScoreReveal({ matchScore, person1, person2 }) {
           </div>
         </motion.div>
 
-        <h3 className="font-script text-3xl sm:text-4xl text-deep-crimson mb-4 tracking-wide">
+        <h3 className="font-script text-3xl sm:text-4xl text-soft-crimson mb-4 tracking-wide">
           Love Meter
         </h3>
 
         <div className="mb-8">
-          <p className="text-soft-rose mb-4 text-sm sm:text-base font-semibold tracking-wider">
+          <p className="text-hot-pink mb-4 text-sm sm:text-base font-semibold tracking-wider">
             {person1} × {person2}
           </p>
           
@@ -844,7 +902,7 @@ function ScoreReveal({ matchScore, person1, person2 }) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: "spring" }}
-                className={`text-5xl sm:text-6xl font-bold ${matchScore > 5 ? 'text-deep-crimson' : 'text-soft-rose'}`}
+                className={`text-5xl sm:text-6xl font-bold ${matchScore > 5 ? 'text-soft-crimson' : 'text-hot-pink'}`}
               >
                 {matchScore}
               </motion.p>
@@ -858,12 +916,12 @@ function ScoreReveal({ matchScore, person1, person2 }) {
           >
             {matchScore > 7 ? (
               <div className="space-y-3">
-                <p className="text-2xl font-script text-deep-crimson">Perfect Match! 💖</p>
-                <p className="text-soft-rose font-semibold">Destined to be together!</p>
+                <p className="text-2xl font-script text-soft-crimson">Perfect Match! 💖</p>
+                <p className="text-hot-pink font-semibold">Destined to be together!</p>
                 <motion.div
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-soft-rose to-blush-pink text-white px-6 py-3 rounded-full font-bold shadow-lg"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-hot-pink to-rose-pink text-white px-6 py-3 rounded-full font-bold shadow-lg"
                 >
                   <Sparkles size={18} />
                   +50 Points
@@ -871,12 +929,12 @@ function ScoreReveal({ matchScore, person1, person2 }) {
               </div>
             ) : matchScore > 5 ? (
               <div className="space-y-3">
-                <p className="text-2xl font-script text-deep-crimson">Great Chemistry! 💕</p>
-                <p className="text-soft-rose font-semibold">Love is in the air!</p>
+                <p className="text-2xl font-script text-soft-crimson">Great Chemistry! 💕</p>
+                <p className="text-hot-pink font-semibold">Love is in the air!</p>
                 <motion.div
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-soft-rose to-blush-pink text-white px-6 py-3 rounded-full font-bold shadow-lg"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-hot-pink to-rose-pink text-white px-6 py-3 rounded-full font-bold shadow-lg"
                 >
                   <Heart size={18} />
                   +25 Points
@@ -884,20 +942,20 @@ function ScoreReveal({ matchScore, person1, person2 }) {
               </div>
             ) : matchScore > 3 ? (
               <div className="space-y-3">
-                <p className="text-2xl font-script text-soft-rose">It's Okay 💗</p>
-                <p className="text-deep-crimson/70 font-semibold">Maybe just friends?</p>
-                <div className="inline-flex items-center gap-2 bg-blush-pink/50 text-deep-crimson px-6 py-3 rounded-full font-bold shadow-lg">
+                <p className="text-2xl font-script text-hot-pink">It's Okay 💗</p>
+                <p className="text-soft-crimson/70 font-semibold">Maybe just friends?</p>
+                <div className="inline-flex items-center gap-2 bg-rose-pink/50 text-soft-crimson px-6 py-3 rounded-full font-bold shadow-lg">
                   No Points
                 </div>
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-2xl font-script text-deep-crimson">Not Compatible 💔</p>
-                <p className="text-soft-rose font-semibold">Better luck next time!</p>
+                <p className="text-2xl font-script text-soft-crimson">Not Compatible 💔</p>
+                <p className="text-hot-pink font-semibold">Better luck next time!</p>
                 <motion.div
                   animate={{ rotate: [0, -5, 5, 0] }}
                   transition={{ duration: 0.5, repeat: Infinity }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-deep-crimson to-soft-rose text-white px-6 py-3 rounded-full font-bold shadow-lg"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-soft-crimson to-hot-pink text-white px-6 py-3 rounded-full font-bold shadow-lg"
                 >
                   -10 Points
                 </motion.div>
@@ -910,7 +968,7 @@ function ScoreReveal({ matchScore, person1, person2 }) {
   )
 }
 
-// Leaderboard Component
+// Leaderboard Component - Premium Vertical Timeline
 function Leaderboard({ data }) {
   return (
     <motion.div
@@ -919,85 +977,130 @@ function Leaderboard({ data }) {
       exit={{ opacity: 0, y: -20 }}
       className="max-w-5xl mx-auto"
     >
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl sm:rounded-[3rem] shadow-2xl p-6 sm:p-8 md:p-12 border border-white/50">
-        <div className="text-center mb-8 md:mb-12">
+      <div className="frosted-glass rounded-[3rem] shadow-rose-lg p-6 sm:p-8 md:p-12">
+        <div className="text-center mb-12 md:mb-16">
           <motion.div
             initial={{ scale: 0 }}
-            animate={{ scale: 1, rotate: [0, 360] }}
-            transition={{ type: "spring", duration: 0.8 }}
-            className="inline-block mb-4"
+            animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+            transition={{ type: "spring", duration: 1, repeat: Infinity, repeatDelay: 3 }}
+            className="inline-block mb-6"
           >
-            <Trophy className="w-16 h-16 sm:w-20 sm:h-20 text-amber-500" />
+            <Trophy strokeWidth={1.5} className="w-16 h-16 sm:w-20 sm:h-20 text-soft-crimson" />
           </motion.div>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
-            Hall of Cupids
+          <h2 className="font-script text-4xl sm:text-5xl md:text-6xl text-soft-crimson mb-3">
+            Hall of Fame
           </h2>
-          <p className="text-gray-600 text-sm sm:text-base">
-            The legendary matchmakers who bring hearts together 💘
+          <p className="text-soft-crimson/70 text-sm sm:text-base font-sans">
+            The legendary matchmakers who bring hearts together
           </p>
         </div>
 
-        <div className="space-y-3 sm:space-y-4">
-          {data.map((player, index) => (
+        {/* Top 3 Podium - Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {data.slice(0, 3).map((player, index) => {
+            const rankColors = {
+              1: { gradient: 'from-amber-400 via-yellow-500 to-amber-400', text: 'text-amber-600', icon: Crown },
+              2: { gradient: 'from-gray-300 via-zinc-400 to-gray-300', text: 'text-gray-600', icon: Award },
+              3: { gradient: 'from-orange-400 via-amber-500 to-orange-400', text: 'text-orange-600', icon: Medal }
+            }
+            const config = rankColors[player.rank]
+            const RankIcon = config.icon
+
+            return (
+              <motion.div
+                key={player.rank}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.15, type: "spring" }}
+                whileHover={{ scale: 1.03, y: -8 }}
+                className={`relative glow-ring rounded-3xl p-6 ${
+                  player.rank === 1 ? 'md:col-start-2 md:order-first' : ''
+                }`}
+              >
+                <div className="frosted-glass-dark rounded-2xl p-6 h-full flex flex-col items-center">
+                  {/* Rank Badge */}
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-rose-lg mb-4`}>
+                    <RankIcon strokeWidth={1.5} className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+
+                  {/* Avatar Circle */}
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center shadow-rose mb-4">
+                    <Heart strokeWidth={1.5} fill="white" className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                  </div>
+
+                  {/* Name */}
+                  <h3 className={`font-script text-xl sm:text-2xl ${config.text} mb-2 text-center`}>
+                    {player.name}
+                  </h3>
+
+                  {/* Stats Grid */}
+                  <div className="w-full space-y-3 mt-4">
+                    <div className="flex items-center justify-between p-3 frosted-glass rounded-xl">
+                      <span className="text-soft-crimson/60 text-sm font-sans">Points</span>
+                      <span className="text-soft-crimson font-bold text-lg">{player.points.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 frosted-glass rounded-xl">
+                      <span className="text-soft-crimson/60 text-sm font-sans">Matches</span>
+                      <span className="text-soft-crimson font-bold text-lg">{player.matches}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 frosted-glass rounded-xl">
+                      <span className="text-soft-crimson/60 text-sm font-sans">Success</span>
+                      <span className="text-soft-crimson font-bold text-lg">{player.successRate}%</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {/* Remaining Rankings - Vertical Timeline */}
+        <div className="space-y-4">
+          {data.slice(3).map((player, index) => (
             <motion.div
               key={player.rank}
-              initial={{ x: -100, opacity: 0 }}
+              initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.1, type: "spring" }}
+              transition={{ delay: (index + 3) * 0.1 }}
               whileHover={{ scale: 1.02, x: 8 }}
-              className={`relative overflow-hidden rounded-2xl sm:rounded-3xl transition-all ${
-                player.rank === 1
-                  ? 'bg-gradient-to-r from-yellow-200 via-amber-200 to-yellow-200 border-3 border-yellow-400 shadow-xl shadow-yellow-200/50'
-                  : player.rank === 2
-                  ? 'bg-gradient-to-r from-gray-200 via-zinc-200 to-gray-200 border-3 border-gray-400 shadow-xl shadow-gray-200/50'
-                  : player.rank === 3
-                  ? 'bg-gradient-to-r from-orange-200 via-amber-100 to-orange-200 border-3 border-orange-400 shadow-xl shadow-orange-200/50'
-                  : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 shadow-lg'
-              }`}
+              className="frosted-glass rounded-2xl p-5 sm:p-6 shadow-rose hover:shadow-rose-lg transition-all"
             >
-              {/* Rank Badge */}
-              <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-4 sm:p-5 md:p-6">
-                <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center ${
-                  player.rank <= 3 ? 'bg-white/40 backdrop-blur-sm' : 'bg-gradient-to-br from-rose-100 to-pink-100'
-                }`}>
-                  {player.rank <= 3 ? (
-                    <span className="text-4xl sm:text-5xl">{player.rank === 1 ? '👑' : player.rank === 2 ? '⭐' : '🌟'}</span>
-                  ) : (
-                    <span className="text-xl sm:text-2xl font-bold text-gray-600">#{player.rank}</span>
-                  )}
+              <div className="flex items-center gap-4 sm:gap-6">
+                {/* Rank Number */}
+                <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center shadow-rose">
+                  <span className="text-white font-bold text-lg sm:text-xl">#{player.rank}</span>
                 </div>
 
                 {/* Avatar */}
-                <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl shadow-lg ${
-                  player.rank === 1 ? 'bg-gradient-to-br from-amber-400 to-yellow-500' :
-                  player.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-zinc-400' :
-                  player.rank === 3 ? 'bg-gradient-to-br from-orange-300 to-amber-400' :
-                  'bg-gradient-to-br from-rose-300 to-pink-400'
-                }`}>
-                  {player.avatar}
+                <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-rose-pink to-hot-pink flex items-center justify-center shadow-rose">
+                  <User strokeWidth={1.5} size={24} className="text-soft-crimson" />
                 </div>
 
                 {/* Info */}
                 <div className="flex-grow min-w-0">
-                  <h3 className="font-bold text-base sm:text-lg md:text-xl text-gray-800 truncate">
+                  <h3 className="font-sans font-bold text-base sm:text-lg text-soft-crimson truncate mb-1">
                     {player.name}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
-                    <p className="text-xs sm:text-sm text-gray-600">
-                      {player.matches} perfect matches
-                    </p>
+                  <div className="flex items-center gap-4 text-xs sm:text-sm text-soft-crimson/60">
+                    <span className="flex items-center gap-1">
+                      <Heart strokeWidth={1.5} size={14} />
+                      {player.matches} matches
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Zap strokeWidth={1.5} size={14} />
+                      {player.successRate}% success
+                    </span>
                   </div>
                 </div>
 
-                {/* Points */}
-                <div className="flex-shrink-0 text-right">
+                {/* Points Badge */}
+                <div className="flex-shrink-0">
                   <motion.div
                     whileHover={{ scale: 1.1 }}
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg"
+                    className="satin-button px-4 sm:px-6 py-2 sm:py-3 rounded-xl flex items-center gap-2"
                   >
-                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
-                    <span className="text-lg sm:text-xl md:text-2xl font-bold">
+                    <Star strokeWidth={1.5} size={16} fill="white" className="text-white" />
+                    <span className="text-base sm:text-lg font-bold text-white">
                       {player.points.toLocaleString()}
                     </span>
                   </motion.div>
@@ -1007,32 +1110,32 @@ function Leaderboard({ data }) {
           ))}
         </div>
 
-        {/* Your Stats */}
+        {/* Your Stats Card */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="mt-8 p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 text-white shadow-2xl"
+          transition={{ delay: 1.2 }}
+          className="mt-10 frosted-glass-dark rounded-3xl p-6 sm:p-8 shadow-rose-lg"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-xl sm:text-2xl flex items-center gap-2">
-              <User className="w-6 h-6" />
+            <h3 className="font-script text-2xl sm:text-3xl text-soft-crimson flex items-center gap-3">
+              <User strokeWidth={1.5} className="w-7 h-7" />
               Your Journey
             </h3>
-            <Star className="w-8 h-8 fill-white" />
+            <Sparkles strokeWidth={1.5} className="w-8 h-8 text-soft-crimson animate-glow-pulse" />
           </div>
           <div className="grid grid-cols-3 gap-4 sm:gap-6">
-            <div className="text-center">
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold">1,245</p>
-              <p className="text-xs sm:text-sm opacity-90 mt-1">Total Points</p>
+            <div className="text-center p-4 frosted-glass rounded-2xl">
+              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-soft-crimson">1,245</p>
+              <p className="text-xs sm:text-sm text-soft-crimson/60 mt-2 font-sans">Total Points</p>
             </div>
-            <div className="text-center border-x border-white/30">
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold">#12</p>
-              <p className="text-xs sm:text-sm opacity-90 mt-1">Your Rank</p>
+            <div className="text-center p-4 frosted-glass rounded-2xl">
+              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-soft-crimson">#12</p>
+              <p className="text-xs sm:text-sm text-soft-crimson/60 mt-2 font-sans">Your Rank</p>
             </div>
-            <div className="text-center">
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold">50</p>
-              <p className="text-xs sm:text-sm opacity-90 mt-1">Matches Made</p>
+            <div className="text-center p-4 frosted-glass rounded-2xl">
+              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-soft-crimson">50</p>
+              <p className="text-xs sm:text-sm text-soft-crimson/60 mt-2 font-sans">Matches Made</p>
             </div>
           </div>
         </motion.div>
@@ -1041,8 +1144,18 @@ function Leaderboard({ data }) {
   )
 }
 
-// Trending Pairs Component
+// Trending Pairs Component - Stacked Cards with Reveal Animation
 function TrendingPairs({ pairs }) {
+  const [revealedPairs, setRevealedPairs] = useState([])
+
+  const toggleReveal = (index) => {
+    if (revealedPairs.includes(index)) {
+      setRevealedPairs(revealedPairs.filter(i => i !== index))
+    } else {
+      setRevealedPairs([...revealedPairs, index])
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -1050,114 +1163,163 @@ function TrendingPairs({ pairs }) {
       exit={{ opacity: 0, y: -20 }}
       className="max-w-6xl mx-auto"
     >
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl sm:rounded-[3rem] shadow-2xl p-6 sm:p-8 md:p-12 border border-white/50">
-        <div className="text-center mb-8 md:mb-12">
+      <div className="frosted-glass rounded-[3rem] shadow-rose-lg p-6 sm:p-8 md:p-12">
+        <div className="text-center mb-12 md:mb-16">
           <motion.div
-            animate={{ rotate: [0, 10, -10, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-            className="inline-block mb-4"
+            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="inline-block mb-6"
           >
-            <TrendingUp className="w-16 h-16 sm:w-20 sm:h-20 text-purple-500" />
+            <Flame strokeWidth={1.5} className="w-16 h-16 sm:w-20 sm:h-20 text-soft-crimson" />
           </motion.div>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Campus Buzz
+          <h2 className="font-script text-4xl sm:text-5xl md:text-6xl text-soft-crimson mb-3">
+            The Buzz
           </h2>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Everyone's curious about these potential love stories 👀💕
+          <p className="text-soft-crimson/70 text-sm sm:text-base font-sans">
+            Everyone's curious about these potential love stories
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-          {pairs.map((pair, index) => (
-            <motion.div
-              key={index}
-              initial={{ scale: 0.8, opacity: 0, rotateY: -90 }}
-              animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-              transition={{ delay: index * 0.15, type: "spring" }}
-              whileHover={{ scale: 1.03, y: -5 }}
-              className="relative group"
-            >
-              <div className="bg-gradient-to-br from-white via-rose-50/30 to-pink-50/30 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-rose-200/50 hover:border-rose-300 transition-all">
-                {/* Popularity Badge */}
+        <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+          {pairs.map((pair, index) => {
+            const isRevealed = revealedPairs.includes(index)
+            return (
+              <motion.div
+                key={index}
+                initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, type: "spring" }}
+                className="relative group stacked-card"
+              >
+                {/* Stacked Card Effect - Background cards */}
+                <div className="absolute inset-x-0 top-2 h-full frosted-glass rounded-3xl -z-10 scale-[0.97] opacity-50" />
+                <div className="absolute inset-x-0 top-4 h-full frosted-glass rounded-3xl -z-20 scale-[0.94] opacity-30" />
+
+                {/* Main Card */}
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: index * 0.15 + 0.3, type: "spring" }}
-                  className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg z-10"
+                  whileHover={{ scale: 1.02, y: -8 }}
+                  className="frosted-glass-dark rounded-3xl p-6 shadow-rose-lg relative overflow-hidden"
                 >
-                  <TrendingUp size={14} />
-                  #{index + 1}
-                </motion.div>
+                  {/* Trending Badge */}
+                  <div className="absolute -top-3 -right-3 satin-button px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 shadow-rose z-10">
+                    <TrendingUp strokeWidth={1.5} size={14} />
+                    #{index + 1}
+                  </div>
 
-                {/* Person 1 */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center shadow-lg">
-                    <User size={28} className="text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-base sm:text-lg text-gray-800 truncate">{pair.person1}</p>
-                    <p className="text-xs text-gray-500">Heart #1</p>
-                  </div>
-                </div>
-
-                {/* Connection Visual */}
-                <div className="flex items-center justify-center my-6 relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t-2 border-dashed border-rose-300"></div>
-                  </div>
-                  <motion.div
-                    animate={{ 
-                      scale: [1, 1.3, 1],
-                      rotate: [0, 180, 360]
-                    }}
-                    transition={{ 
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                    className="relative bg-white rounded-full p-3 shadow-lg"
-                  >
-                    <Heart className="w-8 h-8 fill-rose-500 text-rose-500" />
-                  </motion.div>
-                </div>
-
-                {/* Person 2 */}
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
-                    <User size={28} className="text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-base sm:text-lg text-gray-800 truncate">{pair.person2}</p>
-                    <p className="text-xs text-gray-500">Heart #2</p>
-                  </div>
-                </div>
-
-                {/* Score - Hidden */}
-                <div className="relative overflow-hidden">
-                  <div className="bg-gradient-to-r from-rose-100 via-pink-100 to-rose-100 rounded-2xl p-4 text-center backdrop-blur-sm border border-rose-200">
-                    <div className="flex items-center justify-center gap-3 mb-2">
-                      <Lock className="w-5 h-5 text-rose-600" />
-                      <span className="text-3xl font-bold text-rose-600 tracking-wider">? ? ?</span>
-                      <Lock className="w-5 h-5 text-rose-600" />
+                  {/* Person 1 */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center shadow-rose">
+                      <User strokeWidth={1.5} size={24} className="text-white" />
                     </div>
-                    <p className="text-xs text-gray-600 font-semibold">Match Score Classified</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans font-bold text-base sm:text-lg text-soft-crimson truncate">{pair.person1}</p>
+                      <p className="text-xs text-soft-crimson/60 font-sans">First Heart</p>
+                    </div>
                   </div>
-                  
-                  {/* Hover reveal hint */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity rounded-2xl"></div>
-                </div>
 
-                {/* Search Count */}
-                <div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
-                  <Search className="w-4 h-4" />
-                  <span className="text-sm font-semibold">
-                    {pair.searches} curious searches
-                  </span>
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                  {/* Connection Visual */}
+                  <div className="flex items-center justify-center my-6 relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t-2 border-dashed border-soft-crimson/20"></div>
+                    </div>
+                    <motion.div
+                      animate={{ 
+                        scale: isRevealed ? [1, 1.2, 1] : 1,
+                        rotate: isRevealed ? [0, 180, 360] : 0
+                      }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: isRevealed ? Infinity : 0,
+                        ease: "easeInOut"
+                      }}
+                      className="relative frosted-glass rounded-full p-3 shadow-rose"
+                    >
+                      <AnimatePresence mode="wait">
+                        {isRevealed ? (
+                          <motion.div
+                            key="heart"
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            exit={{ scale: 0, rotate: 180 }}
+                            transition={{ type: "spring", duration: 0.5 }}
+                          >
+                            <Heart strokeWidth={1.5} fill="currentColor" className="w-8 h-8 text-soft-crimson" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="eye-off"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                          >
+                            <EyeOff strokeWidth={1.5} className="w-8 h-8 text-soft-crimson" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
+
+                  {/* Person 2 */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-pink to-hot-pink flex items-center justify-center shadow-rose">
+                      <User strokeWidth={1.5} size={24} className="text-soft-crimson" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans font-bold text-base sm:text-lg text-soft-crimson truncate">{pair.person2}</p>
+                      <p className="text-xs text-soft-crimson/60 font-sans">Second Heart</p>
+                    </div>
+                  </div>
+
+                  {/* Reveal Button / Score */}
+                  <motion.button
+                    onClick={() => toggleReveal(index)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full frosted-glass rounded-2xl p-4 transition-all hover:shadow-rose"
+                  >
+                    <AnimatePresence mode="wait">
+                      {isRevealed ? (
+                        <motion.div
+                          key="revealed"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          className="flex items-center justify-center gap-3"
+                        >
+                          <Eye strokeWidth={1.5} className="w-5 h-5 text-soft-crimson" />
+                          <span className="text-3xl font-bold text-soft-crimson tracking-wide">
+                            {Math.floor(Math.random() * 3) + 7}/10
+                          </span>
+                          <Heart strokeWidth={1.5} fill="currentColor" className="w-5 h-5 text-soft-crimson" />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="hidden"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex items-center justify-center gap-3"
+                        >
+                          <EyeOff strokeWidth={1.5} className="w-5 h-5 text-soft-crimson/60" />
+                          <span className="text-xl font-bold text-soft-crimson/60 tracking-wider">? ? ?</span>
+                          <span className="text-xs text-soft-crimson/60 font-sans">Click to reveal</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+
+                  {/* Search Count */}
+                  <div className="mt-4 flex items-center justify-center gap-2 text-soft-crimson/60">
+                    <Search strokeWidth={1.5} className="w-4 h-4" />
+                    <span className="text-sm font-sans font-semibold">
+                      {pair.searches} curious searches
+                    </span>
+                    <Sparkles strokeWidth={1.5} className="w-4 h-4 text-rose-gold" />
+                  </div>
+                </motion.div>
+              </motion.div>
+            )
+          })}
         </div>
 
         {/* Call to Action */}
@@ -1165,42 +1327,33 @@ function TrendingPairs({ pairs }) {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-8 relative overflow-hidden rounded-3xl"
+          className="mt-10 relative overflow-hidden rounded-3xl frosted-glass-dark shadow-rose-lg"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 opacity-90"></div>
-          <div className="relative p-8 sm:p-10 text-center text-white">
-            <motion.div
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute top-4 right-4 opacity-20"
-            >
-              <Crown size={100} />
-            </motion.div>
-            
+          <div className="relative p-8 sm:p-10 text-center">
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="inline-block mb-4"
+              className="inline-block mb-6"
             >
-              <Sparkles className="w-12 h-12 sm:w-16 sm:h-16" />
+              <Sparkles strokeWidth={1.5} className="w-12 h-12 sm:w-16 sm:h-16 text-soft-crimson" />
             </motion.div>
             
-            <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
-              Unlock Their Love Story!
+            <h3 className="font-script text-3xl sm:text-4xl md:text-5xl text-soft-crimson mb-4">
+              Unlock Their Love Story
             </h3>
-            <p className="text-sm sm:text-base md:text-lg opacity-95 mb-6 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-soft-crimson/70 mb-8 max-w-2xl mx-auto font-sans">
               Be the first to discover if these campus crushes are truly meant to be. 
-              Make a match and reveal the hidden compatibility scores! ✨
+              Make a match and reveal the hidden compatibility scores!
             </p>
             
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 bg-white text-rose-600 px-8 py-4 rounded-full font-bold text-base sm:text-lg shadow-2xl hover:shadow-white/20 transition-all"
+              className="satin-button px-8 py-4 rounded-full font-sans text-base sm:text-lg flex items-center gap-3 mx-auto"
             >
-              <Heart className="w-6 h-6 fill-rose-600" />
+              <Heart strokeWidth={1.5} fill="white" className="w-6 h-6 text-white" />
               Start Matchmaking
-              <Sparkles className="w-6 h-6" />
+              <ChevronRight strokeWidth={1.5} className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
         </motion.div>
