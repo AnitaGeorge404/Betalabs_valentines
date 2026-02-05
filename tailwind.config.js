@@ -7,16 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        'hot-pink': '#FF4D6D',
-        'soft-crimson': '#D00000',
-        'blush': '#FFF0F5',
-        'rose-pink': '#FFD1DC',
-        'soft-pink': '#FFC2D1',
-        'rose-gold': '#FFD700',
+        'deep-crimson': '#800000',
+        'soft-red': '#DC143C',
+        'light-pink': '#FFF5F7',
+        'pink-shadow': '#FFB6C1',
+        'charcoal': '#2D2D2D',
+        'rose-gold': '#B76E79',
       },
       fontFamily: {
-        'script': ['Great Vibes', 'cursive'],
-        'sans': ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
+        'script': ['Dancing Script', 'cursive'],
+        'serif': ['Playfair Display', 'serif'],
+        'sans': ['Montserrat', 'Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -44,9 +45,9 @@ export default {
         },
       },
       boxShadow: {
-        'rose': '0 10px 30px -10px rgba(255, 77, 109, 0.3)',
-        'rose-lg': '0 20px 50px -15px rgba(255, 77, 109, 0.4)',
-        'blush': '0 10px 30px -10px rgba(255, 193, 209, 0.4)',
+        'pink': '0 20px 50px rgba(255, 182, 193, 0.3)',
+        'pink-lg': '0 25px 60px rgba(255, 182, 193, 0.4)',
+        'elegant': '0 10px 40px rgba(183, 110, 121, 0.15)',
       },
       backgroundSize: {
         '200': '200% 200%',

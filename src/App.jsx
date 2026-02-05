@@ -297,27 +297,25 @@ function App() {
               >
                 <motion.div
                   animate={{ 
-                    rotate: [0, 10, -10, 0],
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.05, 1]
                   }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <Heart fill="currentColor" strokeWidth={0} className="text-hot-pink w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20" />
+                  <Heart fill="currentColor" strokeWidth={0} className="text-deep-crimson w-16 h-16 sm:w-20 sm:h-20 drop-shadow-lg" />
                 </motion.div>
-                <h1 className="font-script text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-soft-crimson tracking-wide">
+                <h1 className="font-script text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-deep-crimson tracking-wide">
                   Cupid's Ledger
                 </h1>
                 <motion.div
                   animate={{ 
-                    rotate: [0, -10, 10, 0],
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.05, 1]
                   }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 >
-                  <Heart fill="currentColor" strokeWidth={0} className="text-hot-pink w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20" />
+                  <Heart fill="currentColor" strokeWidth={0} className="text-deep-crimson w-16 h-16 sm:w-20 sm:h-20 drop-shadow-lg" />
                 </motion.div>
               </motion.div>
-              <p className="text-soft-crimson/80 text-sm sm:text-base md:text-lg font-sans font-medium tracking-wide">
+              <p className="text-deep-crimson/70 text-sm sm:text-base md:text-lg font-sans font-medium tracking-wide">
                 Where Hearts Find Their Perfect Match ✨
               </p>
             </div>
@@ -438,41 +436,36 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
   if (questionnaireComplete) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="max-w-2xl mx-auto text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="max-w-xl mx-auto text-center"
       >
-        <div className="frosted-glass-dark rounded-[3rem] p-8 sm:p-12 md:p-16 shadow-rose-lg">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: [0, 1.2, 1] }}
-            transition={{ duration: 0.6 }}
-            className="mb-8 relative"
-          >
-            <Heart strokeWidth={1} fill="currentColor" className="w-24 h-24 sm:w-32 sm:h-32 mx-auto text-soft-crimson" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Heart strokeWidth={1} fill="currentColor" className="w-24 h-24 sm:w-32 sm:h-32 text-soft-crimson blur-2xl opacity-50 animate-glow-pulse" />
-            </div>
-          </motion.div>
-          
-          <h2 className="font-script text-3xl sm:text-4xl md:text-5xl text-soft-crimson mb-4">
-            Your Heart is Ready
-          </h2>
-          <p className="text-soft-crimson/70 text-base sm:text-lg mb-8 font-sans">
-            Time to discover those destined connections
-          </p>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setCurrentView('dashboard')}
-            className="satin-button px-8 py-4 rounded-full font-sans text-lg inline-flex items-center gap-3"
-          >
-            Begin Matchmaking
-            <ChevronRight strokeWidth={1.5} size={24} className="group-hover:translate-x-1 transition-transform" />
-          </motion.button>
-        </div>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", duration: 0.6 }}
+          className="mb-8"
+        >
+          <Heart strokeWidth={1.2} className="w-32 h-32 mx-auto text-charcoal" />
+        </motion.div>
+        
+        <h2 className="font-serif text-4xl sm:text-5xl font-bold text-charcoal mb-4">
+          Your Heart is Ready
+        </h2>
+        <p className="text-charcoal/70 text-lg mb-10 font-sans">
+          Time to discover those destined connections
+        </p>
+        
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setCurrentView('dashboard')}
+          className="bg-white text-charcoal px-10 py-4 rounded-full font-sans text-base font-medium inline-flex items-center gap-2 shadow-pink hover:shadow-pink-lg transition-all"
+        >
+          Begin Matchmaking
+          <ChevronRight strokeWidth={1.2} size={20} />
+        </motion.button>
       </motion.div>
     )
   }
@@ -485,23 +478,21 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
       transition={{ duration: 0.5 }}
       className="max-w-3xl mx-auto"
     >
-      {/* Modern Progress Bar */}
-      <div className="mb-8 sm:mb-12">
-        <div className="relative w-full h-3 rounded-full overflow-hidden frosted-glass">
+      {/* Elegant Progress */}
+      <div className="mb-8">
+        <div className="relative w-full h-1 rounded-full bg-pink-shadow/20">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="h-full bg-gradient-to-r from-hot-pink via-soft-crimson to-hot-pink relative shadow-rose"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-slide-fade-in" />
-          </motion.div>
+            transition={{ duration: 0.4 }}
+            className="h-full bg-gradient-to-r from-soft-red to-deep-crimson rounded-full shadow-[0_0_15px_rgba(220,20,60,0.5)]"
+          />
         </div>
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-soft-crimson/60 text-xs sm:text-sm font-sans font-semibold tracking-wider uppercase">
+        <div className="flex items-center justify-between mt-3">
+          <p className="text-charcoal/60 text-sm font-sans">
             Question {currentQuestion + 1} of {questions.length}
           </p>
-          <p className="text-soft-crimson text-sm sm:text-base font-sans font-bold">
+          <p className="text-charcoal text-sm font-sans font-semibold">
             {Math.round(progress)}%
           </p>
         </div>
@@ -510,39 +501,38 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
       {/* Question Card */}
       <motion.div
         key={currentQuestion}
-        initial={{ x: 100, opacity: 0, scale: 0.95 }}
-        animate={{ x: 0, opacity: 1, scale: 1 }}
-        exit={{ x: -100, opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="frosted-glass rounded-3xl p-6 sm:p-10 md:p-12 shadow-rose-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white rounded-3xl p-10 sm:p-14 shadow-pink"
       >
-        <div className="flex items-start justify-between mb-8 sm:mb-12">
-          <h2 className="font-script text-2xl sm:text-3xl md:text-4xl text-soft-crimson leading-tight flex-1">
+        <div className="mb-10">
+          <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-charcoal leading-relaxed text-center">
             {question.question}
           </h2>
-          {question.icon && <question.icon strokeWidth={1.5} className="text-soft-crimson w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 ml-4" />}
         </div>
 
         {/* Options */}
-        <div className="grid gap-4 sm:gap-5">
+        <div className="space-y-4">
           {question.options.map((optionObj, index) => {
             const OptionIcon = optionObj.icon
             return (
               <motion.button
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02, x: 8 }}
-                whileTap={{ scale: 0.98 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.01, x: 4 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={() => handleAnswer(optionObj.text)}
-                className="group relative frosted-glass hover:bg-white/60 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-left transition-all duration-300 shadow-rose hover:shadow-rose-lg"
+                className="w-full bg-white hover:bg-pink-shadow/5 rounded-2xl p-6 text-left transition-all border border-pink-shadow/20 hover:border-soft-red shadow-elegant hover:shadow-pink"
               >
-                <div className="relative z-10 flex items-center gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center text-white flex-shrink-0 shadow-rose">
-                    <OptionIcon strokeWidth={1.5} size={20} />
+                <div className="flex items-center gap-4">
+                  <div className="w-11 h-11 rounded-full bg-pink-shadow/10 flex items-center justify-center flex-shrink-0">
+                    <OptionIcon strokeWidth={1.2} size={20} className="text-soft-red" />
                   </div>
-                  <span className="text-soft-crimson font-sans text-base sm:text-lg md:text-xl font-medium transition-colors">
+                  <span className="text-charcoal font-sans text-base sm:text-lg font-medium">
                     {optionObj.text}
                   </span>
                 </div>
@@ -552,30 +542,23 @@ function Questionnaire({ currentQuestion, setCurrentQuestion, answers, setAnswer
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-8 sm:mt-12">
-          <motion.button
-            whileHover={{ scale: 1.05, x: -5 }}
-            whileTap={{ scale: 0.95 }}
+        <div className="flex justify-between items-center mt-10">
+          <button
             onClick={handlePrevious}
             disabled={currentQuestion === 0}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full font-sans text-sm sm:text-base transition-all ${
+            className={`flex items-center gap-2 px-6 py-2 rounded-full font-sans text-sm transition-all ${
               currentQuestion === 0
-                ? 'opacity-30 cursor-not-allowed text-soft-crimson/30'
-                : 'text-soft-crimson frosted-glass hover:shadow-rose'
+                ? 'opacity-30 cursor-not-allowed text-charcoal/30'
+                : 'text-charcoal bg-white hover:shadow-elegant border border-pink-shadow/20'
             }`}
           >
-            <ChevronLeft strokeWidth={1.5} size={20} />
-            <span className="hidden sm:inline">Previous</span>
-          </motion.button>
-
-          <motion.div
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="flex items-center gap-2 text-soft-crimson/60 text-xs sm:text-sm"
-          >
-            <Heart strokeWidth={1.5} size={16} fill="currentColor" />
-            <span className="hidden sm:inline font-sans">Keep going!</span>
-          </motion.div>
+            <ChevronLeft strokeWidth={1.2} size={18} />
+            <span>Previous</span>
+          </button>
+          
+          <span className="text-charcoal/50 text-sm font-sans">
+            {currentQuestion + 1} / {questions.length}
+          </span>
         </div>
       </motion.div>
     </motion.div>
@@ -977,7 +960,7 @@ function Leaderboard({ data }) {
       exit={{ opacity: 0, y: -20 }}
       className="max-w-5xl mx-auto"
     >
-      <div className="frosted-glass rounded-[3rem] shadow-rose-lg p-6 sm:p-8 md:p-12">
+      <div className="bg-white rounded-[3rem] shadow-xl p-6 sm:p-8 md:p-12">
         <div className="text-center mb-12 md:mb-16">
           <motion.div
             initial={{ scale: 0 }}
@@ -985,25 +968,25 @@ function Leaderboard({ data }) {
             transition={{ type: "spring", duration: 1, repeat: Infinity, repeatDelay: 3 }}
             className="inline-block mb-6"
           >
-            <Trophy strokeWidth={1.5} className="w-16 h-16 sm:w-20 sm:h-20 text-soft-crimson" />
+            <Trophy strokeWidth={1.5} className="w-16 h-16 sm:w-20 sm:h-20 text-deep-crimson" />
           </motion.div>
-          <h2 className="font-script text-4xl sm:text-5xl md:text-6xl text-soft-crimson mb-3">
+          <h2 className="font-script text-5xl sm:text-6xl md:text-7xl text-deep-crimson mb-3">
             Hall of Fame
           </h2>
-          <p className="text-soft-crimson/70 text-sm sm:text-base font-sans">
+          <p className="text-charcoal/70 text-sm sm:text-base font-sans">
             The legendary matchmakers who bring hearts together
           </p>
         </div>
 
-        {/* Top 3 Podium - Bento Grid */}
+        {/* Top 3 Bento Grid - Clean Cards Like Screenshot */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {data.slice(0, 3).map((player, index) => {
-            const rankColors = {
-              1: { gradient: 'from-amber-400 via-yellow-500 to-amber-400', text: 'text-amber-600', icon: Crown },
-              2: { gradient: 'from-gray-300 via-zinc-400 to-gray-300', text: 'text-gray-600', icon: Award },
-              3: { gradient: 'from-orange-400 via-amber-500 to-orange-400', text: 'text-orange-600', icon: Medal }
+            const rankConfig = {
+              1: { border: 'border-rose-400', icon: Crown, iconBg: 'bg-gradient-to-br from-rose-400 to-pink-400' },
+              2: { border: 'border-rose-300', icon: Award, iconBg: 'bg-gradient-to-br from-rose-300 to-pink-300' },
+              3: { border: 'border-pink-300', icon: Medal, iconBg: 'bg-gradient-to-br from-pink-300 to-rose-200' }
             }
-            const config = rankColors[player.rank]
+            const config = rankConfig[player.rank]
             const RankIcon = config.icon
 
             return (
@@ -1013,39 +996,37 @@ function Leaderboard({ data }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.15, type: "spring" }}
                 whileHover={{ scale: 1.03, y: -8 }}
-                className={`relative glow-ring rounded-3xl p-6 ${
-                  player.rank === 1 ? 'md:col-start-2 md:order-first' : ''
-                }`}
+                className={`bg-white rounded-3xl border-4 ${config.border} p-8 shadow-pink hover:shadow-elegant transition-all`}
               >
-                <div className="frosted-glass-dark rounded-2xl p-6 h-full flex flex-col items-center">
-                  {/* Rank Badge */}
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-rose-lg mb-4`}>
-                    <RankIcon strokeWidth={1.5} className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                <div className="flex flex-col items-center">
+                  {/* Icon Badge */}
+                  <div className={`w-16 h-16 rounded-full ${config.iconBg} flex items-center justify-center mb-4 shadow-lg`}>
+                    <RankIcon className="w-8 h-8 text-white" strokeWidth={2} />
                   </div>
 
-                  {/* Avatar Circle */}
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center shadow-rose mb-4">
-                    <Heart strokeWidth={1.5} fill="white" className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                  {/* Heart Circle */}
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center mb-4 shadow-lg">
+                    <Heart fill="white" className="w-12 h-12 text-white" strokeWidth={0} />
                   </div>
 
                   {/* Name */}
-                  <h3 className={`font-script text-xl sm:text-2xl ${config.text} mb-2 text-center`}>
+                  <h3 className="font-script text-2xl text-deep-crimson mb-6">
                     {player.name}
                   </h3>
 
-                  {/* Stats Grid */}
-                  <div className="w-full space-y-3 mt-4">
-                    <div className="flex items-center justify-between p-3 frosted-glass rounded-xl">
-                      <span className="text-soft-crimson/60 text-sm font-sans">Points</span>
-                      <span className="text-soft-crimson font-bold text-lg">{player.points.toLocaleString()}</span>
+                  {/* Stats */}
+                  <div className="w-full space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-charcoal/60 text-sm font-sans">Points</span>
+                      <span className="text-charcoal font-bold text-lg">{player.points.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 frosted-glass rounded-xl">
-                      <span className="text-soft-crimson/60 text-sm font-sans">Matches</span>
-                      <span className="text-soft-crimson font-bold text-lg">{player.matches}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-charcoal/60 text-sm font-sans">Matches</span>
+                      <span className="text-charcoal font-bold text-lg">{player.matches}</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 frosted-glass rounded-xl">
-                      <span className="text-soft-crimson/60 text-sm font-sans">Success</span>
-                      <span className="text-soft-crimson font-bold text-lg">{player.successRate}%</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-charcoal/60 text-sm font-sans">Success</span>
+                      <span className="text-charcoal font-bold text-lg">{player.successRate}%</span>
                     </div>
                   </div>
                 </div>
@@ -1054,7 +1035,7 @@ function Leaderboard({ data }) {
           })}
         </div>
 
-        {/* Remaining Rankings - Vertical Timeline */}
+        {/* Remaining Rankings - Simple Clean Cards */}
         <div className="space-y-4">
           {data.slice(3).map((player, index) => (
             <motion.div
@@ -1062,48 +1043,36 @@ function Leaderboard({ data }) {
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: (index + 3) * 0.1 }}
-              whileHover={{ scale: 1.02, x: 8 }}
-              className="frosted-glass rounded-2xl p-5 sm:p-6 shadow-rose hover:shadow-rose-lg transition-all"
+              whileHover={{ scale: 1.02 }}
+              className="bg-white rounded-2xl p-6 shadow-elegant hover:shadow-pink transition-all"
             >
-              <div className="flex items-center gap-4 sm:gap-6">
-                {/* Rank Number */}
-                <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center shadow-rose">
-                  <span className="text-white font-bold text-lg sm:text-xl">#{player.rank}</span>
+              <div className="flex items-center gap-6">
+                {/* Rank */}
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">#{player.rank}</span>
                 </div>
 
                 {/* Avatar */}
-                <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-rose-pink to-hot-pink flex items-center justify-center shadow-rose">
-                  <User strokeWidth={1.5} size={24} className="text-soft-crimson" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-deep-crimson/10 flex items-center justify-center">
+                  <User strokeWidth={1.5} size={20} className="text-deep-crimson" />
                 </div>
 
                 {/* Info */}
-                <div className="flex-grow min-w-0">
-                  <h3 className="font-sans font-bold text-base sm:text-lg text-soft-crimson truncate mb-1">
+                <div className="flex-grow">
+                  <h3 className="font-sans font-bold text-lg text-charcoal mb-1">
                     {player.name}
                   </h3>
-                  <div className="flex items-center gap-4 text-xs sm:text-sm text-soft-crimson/60">
-                    <span className="flex items-center gap-1">
-                      <Heart strokeWidth={1.5} size={14} />
-                      {player.matches} matches
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Zap strokeWidth={1.5} size={14} />
-                      {player.successRate}% success
-                    </span>
+                  <div className="flex items-center gap-4 text-sm text-charcoal/60">
+                    <span>{player.matches} matches</span>
+                    <span>{player.successRate}% success</span>
                   </div>
                 </div>
 
-                {/* Points Badge */}
-                <div className="flex-shrink-0">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    className="satin-button px-4 sm:px-6 py-2 sm:py-3 rounded-xl flex items-center gap-2"
-                  >
-                    <Star strokeWidth={1.5} size={16} fill="white" className="text-white" />
-                    <span className="text-base sm:text-lg font-bold text-white">
-                      {player.points.toLocaleString()}
-                    </span>
-                  </motion.div>
+                {/* Points */}
+                <div className="flex-shrink-0 text-right">
+                  <div className="bg-gradient-to-r from-rose-400 to-pink-400 text-white px-6 py-2 rounded-xl font-bold text-lg shadow-lg">
+                    {player.points.toLocaleString()}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -1115,27 +1084,26 @@ function Leaderboard({ data }) {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="mt-10 frosted-glass-dark rounded-3xl p-6 sm:p-8 shadow-rose-lg"
+          className="mt-10 bg-white rounded-3xl p-6 sm:p-8 shadow-pink border border-pink-shadow/20"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-script text-2xl sm:text-3xl text-soft-crimson flex items-center gap-3">
-              <User strokeWidth={1.5} className="w-7 h-7" />
+            <h3 className="font-script text-3xl text-deep-crimson flex items-center gap-3">
               Your Journey
             </h3>
-            <Sparkles strokeWidth={1.5} className="w-8 h-8 text-soft-crimson animate-glow-pulse" />
+            <Sparkles strokeWidth={1.5} className="w-8 h-8 text-soft-red" />
           </div>
-          <div className="grid grid-cols-3 gap-4 sm:gap-6">
-            <div className="text-center p-4 frosted-glass rounded-2xl">
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-soft-crimson">1,245</p>
-              <p className="text-xs sm:text-sm text-soft-crimson/60 mt-2 font-sans">Total Points</p>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="text-center">
+              <p className="text-4xl md:text-5xl font-bold text-deep-crimson">1,245</p>
+              <p className="text-sm text-charcoal/60 mt-2 font-sans">Total Points</p>
             </div>
-            <div className="text-center p-4 frosted-glass rounded-2xl">
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-soft-crimson">#12</p>
-              <p className="text-xs sm:text-sm text-soft-crimson/60 mt-2 font-sans">Your Rank</p>
+            <div className="text-center">
+              <p className="text-4xl md:text-5xl font-bold text-deep-crimson">#12</p>
+              <p className="text-sm text-charcoal/60 mt-2 font-sans">Your Rank</p>
             </div>
-            <div className="text-center p-4 frosted-glass rounded-2xl">
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-soft-crimson">50</p>
-              <p className="text-xs sm:text-sm text-soft-crimson/60 mt-2 font-sans">Matches Made</p>
+            <div className="text-center">
+              <p className="text-4xl md:text-5xl font-bold text-deep-crimson">50</p>
+              <p className="text-sm text-charcoal/60 mt-2 font-sans">Matches Made</p>
             </div>
           </div>
         </motion.div>
@@ -1144,7 +1112,7 @@ function Leaderboard({ data }) {
   )
 }
 
-// Trending Pairs Component - Stacked Cards with Reveal Animation
+// Trending Pairs Component - Clean Elegant Design
 function TrendingPairs({ pairs }) {
   const [revealedPairs, setRevealedPairs] = useState([])
 
@@ -1163,87 +1131,74 @@ function TrendingPairs({ pairs }) {
       exit={{ opacity: 0, y: -20 }}
       className="max-w-6xl mx-auto"
     >
-      <div className="frosted-glass rounded-[3rem] shadow-rose-lg p-6 sm:p-8 md:p-12">
+      <div className="bg-white rounded-[3rem] shadow-pink p-6 sm:p-8 md:p-12">
         <div className="text-center mb-12 md:mb-16">
           <motion.div
-            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 3, repeat: Infinity }}
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="inline-block mb-6"
           >
-            <Flame strokeWidth={1.5} className="w-16 h-16 sm:w-20 sm:h-20 text-soft-crimson" />
+            <Flame strokeWidth={1.2} className="w-16 h-16 sm:w-20 sm:h-20 text-soft-red" />
           </motion.div>
-          <h2 className="font-script text-4xl sm:text-5xl md:text-6xl text-soft-crimson mb-3">
-            The Buzz
+          <h2 className="font-script text-5xl sm:text-6xl md:text-7xl text-deep-crimson mb-3">
+            Campus Crushes
           </h2>
-          <p className="text-soft-crimson/70 text-sm sm:text-base font-sans">
+          <p className="text-charcoal/70 text-sm sm:text-base font-sans">
             Everyone's curious about these potential love stories
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+        <div className="grid sm:grid-cols-2 gap-8">
           {pairs.map((pair, index) => {
             const isRevealed = revealedPairs.includes(index)
             return (
               <motion.div
                 key={index}
-                initial={{ scale: 0.9, opacity: 0, y: 30 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, type: "spring" }}
-                className="relative group stacked-card"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative"
               >
-                {/* Stacked Card Effect - Background cards */}
-                <div className="absolute inset-x-0 top-2 h-full frosted-glass rounded-3xl -z-10 scale-[0.97] opacity-50" />
-                <div className="absolute inset-x-0 top-4 h-full frosted-glass rounded-3xl -z-20 scale-[0.94] opacity-30" />
-
-                {/* Main Card */}
                 <motion.div
-                  whileHover={{ scale: 1.02, y: -8 }}
-                  className="frosted-glass-dark rounded-3xl p-6 shadow-rose-lg relative overflow-hidden"
+                  whileHover={{ y: -4 }}
+                  className="bg-white rounded-3xl p-8 shadow-elegant hover:shadow-pink transition-all border border-pink-shadow/20"
                 >
-                  {/* Trending Badge */}
-                  <div className="absolute -top-3 -right-3 satin-button px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 shadow-rose z-10">
-                    <TrendingUp strokeWidth={1.5} size={14} />
+                  {/* Ranking Badge */}
+                  <div className="absolute -top-3 -right-3 bg-deep-crimson text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
                     #{index + 1}
                   </div>
 
                   {/* Person 1 */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-hot-pink to-soft-crimson flex items-center justify-center shadow-rose">
-                      <User strokeWidth={1.5} size={24} className="text-white" />
+                    <div className="w-14 h-14 rounded-full bg-deep-crimson/10 flex items-center justify-center">
+                      <User strokeWidth={1.2} size={22} className="text-deep-crimson" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-sans font-bold text-base sm:text-lg text-soft-crimson truncate">{pair.person1}</p>
-                      <p className="text-xs text-soft-crimson/60 font-sans">First Heart</p>
+                    <div className="flex-1">
+                      <p className="font-serif text-lg font-semibold text-charcoal">{pair.person1}</p>
+                      <p className="text-xs text-charcoal/50 font-sans">First Heart</p>
                     </div>
                   </div>
 
                   {/* Connection Visual */}
-                  <div className="flex items-center justify-center my-6 relative">
+                  <div className="flex items-center justify-center my-8 relative">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t-2 border-dashed border-soft-crimson/20"></div>
+                      <div className="w-full border-t border-dashed border-pink-shadow/40"></div>
                     </div>
-                    <motion.div
-                      animate={{ 
-                        scale: isRevealed ? [1, 1.2, 1] : 1,
-                        rotate: isRevealed ? [0, 180, 360] : 0
-                      }}
-                      transition={{ 
-                        duration: 2,
-                        repeat: isRevealed ? Infinity : 0,
-                        ease: "easeInOut"
-                      }}
-                      className="relative frosted-glass rounded-full p-3 shadow-rose"
+                    <motion.button
+                      onClick={() => toggleReveal(index)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="relative bg-white rounded-full p-4 shadow-elegant border border-pink-shadow/20 hover:border-soft-red transition-all"
                     >
                       <AnimatePresence mode="wait">
                         {isRevealed ? (
                           <motion.div
-                            key="heart"
-                            initial={{ scale: 0, rotate: -180 }}
+                            key="eye"
+                            initial={{ scale: 0, rotate: -90 }}
                             animate={{ scale: 1, rotate: 0 }}
-                            exit={{ scale: 0, rotate: 180 }}
-                            transition={{ type: "spring", duration: 0.5 }}
+                            exit={{ scale: 0, rotate: 90 }}
                           >
-                            <Heart strokeWidth={1.5} fill="currentColor" className="w-8 h-8 text-soft-crimson" />
+                            <Eye strokeWidth={1.2} className="w-6 h-6 text-soft-red" />
                           </motion.div>
                         ) : (
                           <motion.div
@@ -1252,45 +1207,49 @@ function TrendingPairs({ pairs }) {
                             animate={{ scale: 1 }}
                             exit={{ scale: 0 }}
                           >
-                            <EyeOff strokeWidth={1.5} className="w-8 h-8 text-soft-crimson" />
+                            <EyeOff strokeWidth={1.2} className="w-6 h-6 text-charcoal/40" />
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </motion.div>
+                    </motion.button>
                   </div>
 
                   {/* Person 2 */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-pink to-hot-pink flex items-center justify-center shadow-rose">
-                      <User strokeWidth={1.5} size={24} className="text-soft-crimson" />
+                    <div className="w-14 h-14 rounded-full bg-soft-red/10 flex items-center justify-center">
+                      <User strokeWidth={1.2} size={22} className="text-soft-red" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-sans font-bold text-base sm:text-lg text-soft-crimson truncate">{pair.person2}</p>
-                      <p className="text-xs text-soft-crimson/60 font-sans">Second Heart</p>
+                    <div className="flex-1">
+                      <p className="font-serif text-lg font-semibold text-charcoal">{pair.person2}</p>
+                      <p className="text-xs text-charcoal/50 font-sans">Second Heart</p>
                     </div>
                   </div>
 
-                  {/* Reveal Button / Score */}
-                  <motion.button
-                    onClick={() => toggleReveal(index)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full frosted-glass rounded-2xl p-4 transition-all hover:shadow-rose"
+                  {/* Status Display */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      backgroundColor: isRevealed ? 'rgba(220, 20, 60, 0.05)' : 'rgba(45, 45, 45, 0.03)'
+                    }}
+                    className="rounded-2xl p-4 text-center transition-all"
                   >
                     <AnimatePresence mode="wait">
                       {isRevealed ? (
                         <motion.div
                           key="revealed"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          className="flex items-center justify-center gap-3"
+                          initial={{ opacity: 0, filter: "blur(10px)" }}
+                          animate={{ opacity: 1, filter: "blur(0px)" }}
+                          exit={{ opacity: 0, filter: "blur(10px)" }}
+                          className="space-y-1"
                         >
-                          <Eye strokeWidth={1.5} className="w-5 h-5 text-soft-crimson" />
-                          <span className="text-3xl font-bold text-soft-crimson tracking-wide">
-                            {Math.floor(Math.random() * 3) + 7}/10
-                          </span>
-                          <Heart strokeWidth={1.5} fill="currentColor" className="w-5 h-5 text-soft-crimson" />
+                          <div className="flex items-center justify-center gap-2">
+                            <Heart strokeWidth={1.2} fill="currentColor" className="w-4 h-4 text-soft-red" />
+                            <span className="text-3xl font-bold text-deep-crimson font-serif">
+                              {Math.floor(Math.random() * 3) + 7}/10
+                            </span>
+                            <Heart strokeWidth={1.2} fill="currentColor" className="w-4 h-4 text-soft-red" />
+                          </div>
+                          <p className="text-xs text-charcoal/60 font-sans">Match Score</p>
                         </motion.div>
                       ) : (
                         <motion.div
@@ -1298,65 +1257,29 @@ function TrendingPairs({ pairs }) {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="flex items-center justify-center gap-3"
+                          className="space-y-1"
                         >
-                          <EyeOff strokeWidth={1.5} className="w-5 h-5 text-soft-crimson/60" />
-                          <span className="text-xl font-bold text-soft-crimson/60 tracking-wider">? ? ?</span>
-                          <span className="text-xs text-soft-crimson/60 font-sans">Click to reveal</span>
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="text-2xl font-bold text-charcoal/30 tracking-wider font-serif">? ? ?</span>
+                          </div>
+                          <p className="text-xs text-charcoal/40 font-sans">Top Secret</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.button>
+                  </motion.div>
 
-                  {/* Search Count */}
-                  <div className="mt-4 flex items-center justify-center gap-2 text-soft-crimson/60">
-                    <Search strokeWidth={1.5} className="w-4 h-4" />
-                    <span className="text-sm font-sans font-semibold">
-                      {pair.searches} curious searches
+                  {/* Search Stats */}
+                  <div className="mt-4 flex items-center justify-center gap-2 text-charcoal/50">
+                    <TrendingUp strokeWidth={1.2} className="w-4 h-4" />
+                    <span className="text-sm font-sans">
+                      {pair.searches} searches
                     </span>
-                    <Sparkles strokeWidth={1.5} className="w-4 h-4 text-rose-gold" />
                   </div>
                 </motion.div>
               </motion.div>
             )
           })}
         </div>
-
-        {/* Call to Action */}
-        <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-10 relative overflow-hidden rounded-3xl frosted-glass-dark shadow-rose-lg"
-        >
-          <div className="relative p-8 sm:p-10 text-center">
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="inline-block mb-6"
-            >
-              <Sparkles strokeWidth={1.5} className="w-12 h-12 sm:w-16 sm:h-16 text-soft-crimson" />
-            </motion.div>
-            
-            <h3 className="font-script text-3xl sm:text-4xl md:text-5xl text-soft-crimson mb-4">
-              Unlock Their Love Story
-            </h3>
-            <p className="text-sm sm:text-base md:text-lg text-soft-crimson/70 mb-8 max-w-2xl mx-auto font-sans">
-              Be the first to discover if these campus crushes are truly meant to be. 
-              Make a match and reveal the hidden compatibility scores!
-            </p>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="satin-button px-8 py-4 rounded-full font-sans text-base sm:text-lg flex items-center gap-3 mx-auto"
-            >
-              <Heart strokeWidth={1.5} fill="white" className="w-6 h-6 text-white" />
-              Start Matchmaking
-              <ChevronRight strokeWidth={1.5} className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </div>
-        </motion.div>
       </div>
     </motion.div>
   )
