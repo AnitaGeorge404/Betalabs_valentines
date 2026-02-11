@@ -20,9 +20,19 @@ function Profile({ user, onLogout }) {
           <h2 className="font-script text-4xl text-deep-crimson mb-2">{user?.name || 'Student'}</h2>
           <p className="text-charcoal/60 font-sans">{user?.email || ''}</p>
           {user?.year && (
-            <p className="text-charcoal/40 font-sans text-sm mt-1">
-              Batch of {user.year} &middot; Roll #{user.rollno}
-            </p>
+            <div className="flex items-center justify-center gap-2 mt-2">
+              {user.batch && (
+                <span className="bg-deep-crimson/10 text-deep-crimson font-sans text-xs font-bold px-3 py-1 rounded-full">
+                  Batch {user.batch}
+                </span>
+              )}
+              <span className="bg-soft-red/10 text-soft-red font-sans text-xs font-bold px-3 py-1 rounded-full">
+                {user.year}
+              </span>
+              <span className="bg-pink-shadow/20 text-charcoal/60 font-sans text-xs font-bold px-3 py-1 rounded-full">
+                Roll #{user.rollno}
+              </span>
+            </div>
           )}
         </div>
 

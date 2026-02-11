@@ -1,38 +1,118 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import {
-  Heart, Search, User, Sparkles, X, Filter
-} from 'lucide-react'
-import { getAllUsers, makeMatch } from '../lib/api'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Heart, Search, User, Sparkles, X, Clock } from 'lucide-react'
+import { searchUsers, makeMatch, getCooldown } from '../lib/api'
 
-function MatchFinder({ userEmail }) {
-  const [students, setStudents] = useState([])
+function formatBatchYear(user) {
+  if (!user?.year) return ''
+  const batch = user.batch ? `Batch ${user.batch}` : ''
+  const yr = user.year ? `${user.year}` : ''
+  return [batch, yr].filter(Boolean).join(' | ')
+}
+
+function useDebounce(value, delay) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(timer)
+  }, [value, delay])
+  return debounced
+}
+
+function MatchFinder({ userEmail, onMatchComplete }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [searching, setSearching] = useState(false)
   const [selectedPerson1, setSelectedPerson1] = useState(null)
   const [selectedPerson2, setSelectedPerson2] = useState(null)
   const [matchResult, setMatchResult] = useState(null)
   const [matching, setMatching] = useState(false)
   const [error, setError] = useState(null)
+  const [cooldownRemaining, setCooldownRemaining] = useState(0)
+  const searchRef = useRef(null)
+  const debouncedQuery = useDebounce(searchQuery, 400)
 
+  // Fetch suggestions when debounced query changes
   useEffect(() => {
-    getAllUsers()
-      .then(setStudents)
-      .catch((err) => setError(err.message))
+    if (!debouncedQuery || debouncedQuery.trim().length < 2) {
+      setSuggestions([])
+      setShowDropdown(false)
+      return
+    }
+    setSearching(true)
+    searchUsers(debouncedQuery)
+      .then((data) => {
+        const filtered = data.filter(
+          (s) =>
+            s.email !== selectedPerson1?.email &&
+            s.email !== selectedPerson2?.email
+        )
+        setSuggestions(filtered)
+        setShowDropdown(filtered.length > 0)
+      })
+      .catch(() => setSuggestions([]))
+      .finally(() => setSearching(false))
+  }, [debouncedQuery, selectedPerson1?.email, selectedPerson2?.email])
+
+  // Check cooldown on mount
+  useEffect(() => {
+    if (!userEmail) return
+    getCooldown(userEmail).then((res) => {
+      if (res.cooldown) setCooldownRemaining(res.remaining_seconds)
+    }).catch(() => {})
+  }, [userEmail])
+
+  // Cooldown countdown timer
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return
+    const interval = setInterval(() => {
+      setCooldownRemaining((prev) => {
+        if (prev <= 1) { clearInterval(interval); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [cooldownRemaining])
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const filteredStudents = students.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const selectPerson = useCallback((student) => {
+    if (!selectedPerson1) {
+      setSelectedPerson1(student)
+    } else if (!selectedPerson2) {
+      setSelectedPerson2(student)
+    }
+    setSearchQuery('')
+    setSuggestions([])
+    setShowDropdown(false)
+  }, [selectedPerson1, selectedPerson2])
 
   const handleMatch = async () => {
     if (!selectedPerson1 || !selectedPerson2) return
+    if (cooldownRemaining > 0) return
     setMatching(true)
     setError(null)
     setMatchResult(null)
     try {
       const result = await makeMatch(selectedPerson1.email, selectedPerson2.email, userEmail)
       setMatchResult(result)
+      setCooldownRemaining(180)
+      if (onMatchComplete) onMatchComplete()
     } catch (err) {
+      if (err.message?.includes('Cooldown')) {
+        const match = err.message.match(/(\d+)m\s*(\d+)s/)
+        if (match) setCooldownRemaining(parseInt(match[1]) * 60 + parseInt(match[2]))
+      }
       setError(err.message)
     } finally {
       setMatching(false)
@@ -46,196 +126,252 @@ function MatchFinder({ userEmail }) {
     setError(null)
   }
 
+  const cooldownMins = Math.floor(cooldownRemaining / 60)
+  const cooldownSecs = cooldownRemaining % 60
+  const canMatch = selectedPerson1 && selectedPerson2 && cooldownRemaining <= 0
+
   return (
     <div className="space-y-6">
-      {/* Match Result Modal */}
-      {matchResult && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-br from-deep-crimson/10 to-soft-red/10 rounded-3xl shadow-elegant p-6 sm:p-8 text-center border-2 border-soft-red/30"
-        >
+      {/* Match Result */}
+      <AnimatePresence>
+        {matchResult && (
           <motion.div
-            animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="bg-gradient-to-br from-deep-crimson/10 to-soft-red/10 rounded-3xl shadow-elegant p-6 sm:p-8 text-center border-2 border-soft-red/30"
           >
-            <Heart strokeWidth={0} fill="currentColor" className="w-12 h-12 text-deep-crimson mx-auto mb-4" />
-          </motion.div>
-          <h3 className="font-script text-3xl text-deep-crimson mb-2">Match Score</h3>
-          <p className="text-5xl font-bold text-deep-crimson font-serif mb-2">
-            {matchResult.score}%
-          </p>
-          <p className="text-charcoal/70 font-sans text-sm mb-1">
-            {matchResult.person1_name} & {matchResult.person2_name}
-          </p>
-          {matchResult.points > 0 && (
-            <p className="text-soft-red font-sans text-sm font-bold mb-1">
-              +{matchResult.points} point{matchResult.points > 1 ? 's' : ''} earned!
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <Heart strokeWidth={0} fill="currentColor" className="w-12 h-12 text-deep-crimson mx-auto mb-4" />
+            </motion.div>
+            <h3 className="font-script text-3xl text-deep-crimson mb-2">Match Score</h3>
+            <p className="text-5xl font-bold text-deep-crimson font-serif mb-2">
+              {matchResult.score}%
             </p>
-          )}
-          <p className="text-charcoal/50 font-sans text-xs mb-4">
-            Matched {matchResult.number_of_times_matched} time{matchResult.number_of_times_matched > 1 ? 's' : ''}
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={clearSelection}
-            className="bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans font-semibold shadow-elegant"
-          >
-            Match Again
-          </motion.button>
+            <p className="text-charcoal/70 font-sans text-sm mb-1">
+              {matchResult.person1_name} & {matchResult.person2_name}
+            </p>
+            {matchResult.points > 0 && (
+              <p className="text-soft-red font-sans text-sm font-bold mb-1">
+                +{matchResult.points} point{matchResult.points > 1 ? 's' : ''} earned!
+              </p>
+            )}
+            <p className="text-charcoal/50 font-sans text-xs mb-4">
+              Matched {matchResult.number_of_times_matched} time{matchResult.number_of_times_matched > 1 ? 's' : ''}
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={clearSelection}
+              className="bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans font-semibold shadow-elegant"
+            >
+              Match Again
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-600 text-sm font-sans text-center"
+        >
+          {error}
         </motion.div>
       )}
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-600 text-sm font-sans text-center">
-          {error}
-        </div>
+      {/* Cooldown Banner */}
+      {cooldownRemaining > 0 && !matchResult && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-center gap-3"
+        >
+          <Clock strokeWidth={1.5} className="w-5 h-5 text-amber-600" />
+          <span className="text-amber-700 font-sans text-sm font-semibold">
+            Cooldown: {cooldownMins}m {String(cooldownSecs).padStart(2, '0')}s
+          </span>
+        </motion.div>
       )}
 
-      {/* Search and Filter */}
-      <div className="bg-white rounded-3xl shadow-elegant p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 relative">
-            <Search strokeWidth={1.2} className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal/40" />
-            <input
-              type="text"
-              placeholder="Search students..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border-2 border-pink-shadow/20 rounded-2xl font-sans focus:outline-none focus:border-soft-red transition-all"
-            />
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white border-2 border-pink-shadow/20 rounded-2xl p-3 hover:border-soft-red transition-all"
-          >
-            <Filter strokeWidth={1.2} className="w-5 h-5 text-charcoal" />
-          </motion.button>
-        </div>
-
-        {/* Selected Persons */}
-        {(selectedPerson1 || selectedPerson2) && !matchResult && (
-          <div className="flex flex-wrap items-center gap-4 mb-4 p-4 bg-gradient-to-r from-deep-crimson/5 to-soft-red/5 rounded-2xl">
-            {selectedPerson1 && (
-              <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-deep-crimson/10 flex items-center justify-center">
-                  <User strokeWidth={1.2} size={16} className="text-deep-crimson" />
-                </div>
-                <span className="font-sans text-sm font-semibold text-charcoal">{selectedPerson1.name}</span>
-                <button onClick={() => setSelectedPerson1(null)}>
-                  <X strokeWidth={1.2} size={16} className="text-charcoal/40 hover:text-charcoal" />
-                </button>
-              </div>
-            )}
-
-            {selectedPerson1 && selectedPerson2 && (
-              <Heart strokeWidth={1.2} fill="currentColor" className="w-5 h-5 text-soft-red" />
-            )}
-
-            {selectedPerson2 && (
-              <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-soft-red/10 flex items-center justify-center">
-                  <User strokeWidth={1.2} size={16} className="text-soft-red" />
-                </div>
-                <span className="font-sans text-sm font-semibold text-charcoal">{selectedPerson2.name}</span>
-                <button onClick={() => setSelectedPerson2(null)}>
-                  <X strokeWidth={1.2} size={16} className="text-charcoal/40 hover:text-charcoal" />
-                </button>
-              </div>
-            )}
-
-            {selectedPerson1 && selectedPerson2 && (
-              <motion.button
-                whileHover={{ scale: 1.08, boxShadow: "0 15px 40px rgba(220, 20, 60, 0.4)" }}
-                whileTap={{ scale: 0.95 }}
-                animate={{
-                  scale: [1, 1.05, 1],
-                  boxShadow: [
-                    "0 10px 30px rgba(220, 20, 60, 0.3)",
-                    "0 15px 40px rgba(220, 20, 60, 0.4)",
-                    "0 10px 30px rgba(220, 20, 60, 0.3)"
-                  ]
-                }}
-                transition={{
-                  scale: { duration: 2, repeat: Infinity },
-                  boxShadow: { duration: 2, repeat: Infinity }
-                }}
-                onClick={handleMatch}
-                disabled={matching}
-                className="ml-auto bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans font-semibold shadow-elegant flex items-center gap-2 disabled:opacity-50"
-              >
-                <Heart strokeWidth={1.2} fill="currentColor" className="w-4 h-4" />
-                {matching ? 'Matching...' : 'Match!'}
-              </motion.button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Students List */}
+      {/* Search Bar + Selection Boxes */}
       {!matchResult && (
-        <div className="bg-white rounded-3xl shadow-elegant p-4 sm:p-6">
-          <h3 className="font-serif text-lg sm:text-xl text-deep-crimson mb-4">
-            Select Students
-          </h3>
-          {filteredStudents.length === 0 ? (
-            <p className="text-charcoal/50 font-sans text-sm text-center py-8">
-              {students.length === 0 ? 'Loading students...' : 'No students found'}
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 max-h-96 overflow-y-auto pr-2">
-              {filteredStudents.map((student, index) => {
-                const isSelected =
-                  selectedPerson1?.email === student.email ||
-                  selectedPerson2?.email === student.email
-
-                return (
-                  <motion.button
-                    key={student.email}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.02 }}
-                    whileHover={{
-                      scale: 1.05,
-                      y: -5,
-                      boxShadow: "0 15px 35px rgba(255, 182, 193, 0.4)"
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      if (isSelected) return
-                      if (!selectedPerson1) {
-                        setSelectedPerson1(student)
-                      } else if (!selectedPerson2) {
-                        setSelectedPerson2(student)
-                      }
-                    }}
-                    disabled={isSelected}
-                    className={`p-3 sm:p-4 rounded-2xl border-2 transition-all font-sans text-xs sm:text-sm relative overflow-hidden ${
-                      isSelected
-                        ? 'bg-gradient-to-br from-deep-crimson/10 to-soft-red/10 border-soft-red'
-                        : 'border-pink-shadow/20 hover:border-soft-red bg-white'
-                    } disabled:cursor-not-allowed`}
-                  >
-                    {isSelected && (
-                      <motion.div
-                        className="absolute top-1 right-1"
-                        animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        <Sparkles className="w-3 h-3 text-soft-red" fill="currentColor" />
-                      </motion.div>
-                    )}
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-pink-shadow/20 mx-auto mb-2 flex items-center justify-center">
-                      <User strokeWidth={1.2} size={16} className="text-charcoal sm:w-5 sm:h-5" />
-                    </div>
-                    <p className="text-charcoal font-semibold truncate text-xs sm:text-sm">{student.name}</p>
-                  </motion.button>
-                )
-              })}
+        <div className="bg-white rounded-3xl shadow-elegant p-5 sm:p-6 space-y-5">
+          {/* Search */}
+          <div ref={searchRef} className="relative">
+            <div className="relative">
+              <Search strokeWidth={1.2} className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal/40" />
+              <input
+                type="text"
+                placeholder={
+                  !selectedPerson1
+                    ? 'Search for Person 1...'
+                    : !selectedPerson2
+                    ? 'Search for Person 2...'
+                    : 'Both selected!'
+                }
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
+                disabled={selectedPerson1 && selectedPerson2}
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-pink-shadow/20 rounded-2xl font-sans focus:outline-none focus:border-soft-red transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"
+              />
+              {searching && (
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="w-4 h-4 border-2 border-soft-red/30 border-t-soft-red rounded-full"
+                  />
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Dropdown Suggestions */}
+            <AnimatePresence>
+              {showDropdown && suggestions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="absolute z-30 top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-pink-shadow/20 max-h-64 overflow-y-auto"
+                >
+                  {suggestions.map((student) => (
+                    <button
+                      key={student.email}
+                      onClick={() => selectPerson(student)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-deep-crimson/5 transition-colors first:rounded-t-2xl last:rounded-b-2xl text-left"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-pink-shadow/20 flex items-center justify-center flex-shrink-0">
+                        <User strokeWidth={1.2} size={16} className="text-charcoal" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-sans text-sm font-semibold text-charcoal truncate">
+                          {student.name}
+                        </p>
+                        <p className="font-sans text-xs text-charcoal/50 truncate">
+                          {formatBatchYear(student)}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Two Selection Boxes with X between */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Person 1 Box */}
+            <motion.div
+              layout
+              className={`flex-1 rounded-2xl border-2 p-4 sm:p-5 text-center transition-all min-h-[120px] flex flex-col items-center justify-center ${
+                selectedPerson1
+                  ? 'border-deep-crimson/40 bg-gradient-to-br from-deep-crimson/5 to-soft-red/5'
+                  : 'border-dashed border-pink-shadow/30 bg-gray-50/50'
+              }`}
+            >
+              {selectedPerson1 ? (
+                <div className="relative w-full">
+                  <button
+                    onClick={() => setSelectedPerson1(null)}
+                    className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-charcoal/10 hover:bg-charcoal/20 flex items-center justify-center transition-colors"
+                  >
+                    <X strokeWidth={2} size={12} className="text-charcoal/60" />
+                  </button>
+                  <div className="w-10 h-10 rounded-full bg-deep-crimson/10 mx-auto mb-2 flex items-center justify-center">
+                    <User strokeWidth={1.2} size={18} className="text-deep-crimson" />
+                  </div>
+                  <p className="font-sans text-sm font-semibold text-charcoal truncate">
+                    {selectedPerson1.name}
+                  </p>
+                  <p className="font-sans text-xs text-charcoal/50 mt-0.5">
+                    {formatBatchYear(selectedPerson1)}
+                  </p>
+                </div>
+              ) : (
+                <div className="text-charcoal/30">
+                  <User strokeWidth={1} size={28} className="mx-auto mb-1" />
+                  <p className="font-sans text-xs">Person 1</p>
+                </div>
+              )}
+            </motion.div>
+
+            {/* X / Heart between */}
+            <div className="flex-shrink-0">
+              {selectedPerson1 && selectedPerson2 ? (
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <Heart strokeWidth={0} fill="currentColor" className="w-8 h-8 text-deep-crimson" />
+                </motion.div>
+              ) : (
+                <X strokeWidth={1.5} className="w-6 h-6 text-charcoal/20" />
+              )}
+            </div>
+
+            {/* Person 2 Box */}
+            <motion.div
+              layout
+              className={`flex-1 rounded-2xl border-2 p-4 sm:p-5 text-center transition-all min-h-[120px] flex flex-col items-center justify-center ${
+                selectedPerson2
+                  ? 'border-soft-red/40 bg-gradient-to-br from-soft-red/5 to-pink-shadow/10'
+                  : 'border-dashed border-pink-shadow/30 bg-gray-50/50'
+              }`}
+            >
+              {selectedPerson2 ? (
+                <div className="relative w-full">
+                  <button
+                    onClick={() => setSelectedPerson2(null)}
+                    className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-charcoal/10 hover:bg-charcoal/20 flex items-center justify-center transition-colors"
+                  >
+                    <X strokeWidth={2} size={12} className="text-charcoal/60" />
+                  </button>
+                  <div className="w-10 h-10 rounded-full bg-soft-red/10 mx-auto mb-2 flex items-center justify-center">
+                    <User strokeWidth={1.2} size={18} className="text-soft-red" />
+                  </div>
+                  <p className="font-sans text-sm font-semibold text-charcoal truncate">
+                    {selectedPerson2.name}
+                  </p>
+                  <p className="font-sans text-xs text-charcoal/50 mt-0.5">
+                    {formatBatchYear(selectedPerson2)}
+                  </p>
+                </div>
+              ) : (
+                <div className="text-charcoal/30">
+                  <User strokeWidth={1} size={28} className="mx-auto mb-1" />
+                  <p className="font-sans text-xs">Person 2</p>
+                </div>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Match Button */}
+          <motion.button
+            whileHover={canMatch ? { scale: 1.03 } : {}}
+            whileTap={canMatch ? { scale: 0.97 } : {}}
+            onClick={handleMatch}
+            disabled={!canMatch || matching}
+            className={`w-full py-4 rounded-2xl font-sans font-bold text-base flex items-center justify-center gap-2 transition-all ${
+              canMatch
+                ? 'bg-gradient-to-r from-deep-crimson to-soft-red text-white shadow-elegant cursor-pointer'
+                : 'bg-gray-100 text-charcoal/30 cursor-not-allowed'
+            }`}
+          >
+            <Heart strokeWidth={1.5} fill={canMatch ? 'currentColor' : 'none'} className="w-5 h-5" />
+            {matching
+              ? 'Matching...'
+              : cooldownRemaining > 0
+              ? `Cooldown ${cooldownMins}:${String(cooldownSecs).padStart(2, '0')}`
+              : !selectedPerson1 || !selectedPerson2
+              ? 'Select two people to match'
+              : 'Match!'}
+          </motion.button>
         </div>
       )}
 

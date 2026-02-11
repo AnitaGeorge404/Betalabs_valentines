@@ -2,6 +2,16 @@ from pydantic import BaseModel
 from typing import Optional
 
 
+def compute_batch(rollno: int, year: int) -> int:
+    """Compute batch number from roll number and year.
+    2024/2025: 4 batches (rollno % 4 -> 0=1, 1=2, 2=3, 3=4)
+    2023: 2 batches (rollno % 2 -> 0=1, 1=2)
+    """
+    if year == 2023:
+        return (rollno % 2) + 1
+    return (rollno % 4) + 1
+
+
 class UserCreate(BaseModel):
     email: str
     name: str
@@ -10,6 +20,8 @@ class UserCreate(BaseModel):
 class AnswerSubmit(BaseModel):
     email: str
     answers: dict[str, float]  # { "qid": score }
+    gender: str  # "male" or "female"
+    preference: str  # "men" or "women"
 
 
 class MatchRequest(BaseModel):
@@ -21,8 +33,11 @@ class MatchRequest(BaseModel):
 class UserResponse(BaseModel):
     email: str
     name: str
-    year: int
-    rollno: int
+    year: Optional[int] = None
+    rollno: Optional[int] = None
+    batch: Optional[int] = None
+    gender: Optional[str] = None
+    preference: Optional[str] = None
     answers: Optional[dict] = None
     score: Optional[float] = 0.0
 
@@ -57,3 +72,5 @@ class UserScoreEntry(BaseModel):
     email: str
     name: str
     score: float
+    year: Optional[int] = None
+    batch: Optional[int] = None

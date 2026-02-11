@@ -4,12 +4,18 @@
 CREATE TABLE IF NOT EXISTS users (
     email TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    year INTEGER NOT NULL,
-    rollno INTEGER NOT NULL,
+    year INTEGER,
+    rollno INTEGER,
+    gender TEXT DEFAULT NULL,
+    preference TEXT DEFAULT NULL,
     answers JSONB DEFAULT NULL,
     score FLOAT DEFAULT 0.0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration: add gender/preference columns if table already exists
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS gender TEXT DEFAULT NULL;
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS preference TEXT DEFAULT NULL;
 
 -- Questions table
 CREATE TABLE IF NOT EXISTS questions (

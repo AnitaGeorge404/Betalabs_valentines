@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Trophy, Search, User } from 'lucide-react'
+import { Heart, Trophy, Search, User, Star } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import { registerUser, checkUser } from './lib/api'
 import { FloatingHearts } from './components/FloatingHearts'
@@ -89,6 +89,16 @@ function App() {
     setCurrentPage('main')
   }
 
+  const refreshUserData = async () => {
+    if (!userData?.email) return
+    try {
+      const status = await checkUser(userData.email)
+      if (status.user) setUserData(status.user)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const handleLogout = () => {
     setSession(null)
     setUserData(null)
@@ -118,14 +128,25 @@ function App() {
               </motion.div>
               <h1 className="font-script text-2xl sm:text-3xl text-deep-crimson">Cupid's Ledger</h1>
             </div>
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setMainTab('profile')}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center cursor-pointer shadow-elegant"
-            >
-              <User strokeWidth={1.2} size={18} className="text-white sm:w-5 sm:h-5" />
-            </motion.div>
+            <div className="flex items-center gap-3">
+              {userData?.score != null && (
+                <div className="flex items-center gap-1.5 bg-gradient-to-r from-deep-crimson/10 to-soft-red/10 rounded-xl px-3 py-1.5">
+                  <Star strokeWidth={1.5} className="w-4 h-4 text-soft-red" fill="currentColor" />
+                  <span className="font-sans font-bold text-deep-crimson text-sm">
+                    {Math.round(userData.score || 0)}
+                  </span>
+                  <span className="font-sans text-charcoal/50 text-xs hidden sm:inline">pts</span>
+                </div>
+              )}
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setMainTab('profile')}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center cursor-pointer shadow-elegant"
+              >
+                <User strokeWidth={1.2} size={18} className="text-white sm:w-5 sm:h-5" />
+              </motion.div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -133,7 +154,7 @@ function App() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <AnimatePresence mode="wait">
-          {mainTab === 'match' && <MatchFinder key="match" userEmail={userData?.email} />}
+          {mainTab === 'match' && <MatchFinder key="match" userEmail={userData?.email} onMatchComplete={refreshUserData} />}
           {mainTab === 'leaderboard' && <Leaderboard key="leaderboard" />}
           {mainTab === 'profile' && <Profile key="profile" user={userData} onLogout={handleLogout} />}
         </AnimatePresence>

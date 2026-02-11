@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   Heart, Trophy, User, Sparkles, Crown, Flame,
-  Award, TrendingUp, Medal, Star
+  Award, TrendingUp, Medal, Star, Clock
 } from 'lucide-react'
 import { getCouplesLeaderboard, getUsersLeaderboard } from '../lib/api'
 
@@ -11,19 +11,37 @@ function Leaderboard() {
   const [couples, setCouples] = useState([])
   const [topUsers, setTopUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [nextUpdateIn, setNextUpdateIn] = useState(0)
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true)
     Promise.all([
       getCouplesLeaderboard(20),
       getUsersLeaderboard(20),
     ])
-      .then(([couplesData, usersData]) => {
-        setCouples(couplesData)
-        setTopUsers(usersData)
+      .then(([couplesRes, usersRes]) => {
+        setCouples(couplesRes.data || couplesRes)
+        setTopUsers(usersRes.data || usersRes)
+        const ttl = Math.max(couplesRes.next_update_in || 0, usersRes.next_update_in || 0)
+        setNextUpdateIn(ttl)
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { fetchData() }, [])
+
+  // Countdown timer for next update
+  useEffect(() => {
+    if (nextUpdateIn <= 0) return
+    const interval = setInterval(() => {
+      setNextUpdateIn((prev) => {
+        if (prev <= 1) { clearInterval(interval); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [nextUpdateIn])
 
   if (loading) {
     return (
@@ -70,6 +88,18 @@ function Leaderboard() {
           <Star strokeWidth={1.5} className="w-4 h-4" />
           Top Matchers
         </motion.button>
+      </div>
+
+      {/* Next Update Timer */}
+      <div className="flex items-center justify-center gap-2 text-charcoal/50 font-sans text-xs">
+        <Clock strokeWidth={1.5} className="w-3.5 h-3.5" />
+        {nextUpdateIn > 0 ? (
+          <span>Next update in {Math.floor(nextUpdateIn / 60)}:{String(nextUpdateIn % 60).padStart(2, '0')}</span>
+        ) : (
+          <button onClick={fetchData} className="text-deep-crimson font-semibold hover:underline">
+            Refresh now
+          </button>
+        )}
       </div>
 
       {/* Couples Leaderboard */}

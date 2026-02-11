@@ -1,7 +1,16 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight, Heart } from 'lucide-react'
 import { getQuestions, submitAnswers } from '../lib/api'
+
+function shuffleArray(arr) {
+  const shuffled = [...arr]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
 
 function QuizPage({ userEmail, onComplete }) {
   const [questions, setQuestions] = useState([])
@@ -10,6 +19,12 @@ function QuizPage({ userEmail, onComplete }) {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+  const [phase, setPhase] = useState('profile') // profile | quiz
+  const [gender, setGender] = useState(null)
+  const [preference, setPreference] = useState(null)
+  const [direction, setDirection] = useState(1)
+
+  const shuffledQuestions = useMemo(() => shuffleArray(questions), [questions])
 
   useEffect(() => {
     getQuestions()
@@ -43,7 +58,7 @@ function QuizPage({ userEmail, onComplete }) {
         <div className="bg-white rounded-3xl shadow-pink p-8 text-center max-w-md">
           <p className="text-red-500 font-sans mb-4">{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => { setError(null); window.location.reload() }}
             className="bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans"
           >
             Retry
@@ -53,22 +68,125 @@ function QuizPage({ userEmail, onComplete }) {
     )
   }
 
-  if (questions.length === 0) return null
+  // --- PROFILE PHASE: Gender + Preference ---
+  if (phase === 'profile') {
+    const canProceed = gender && preference
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen flex items-center justify-center p-4 sm:p-6"
+      >
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', bounce: 0.3 }}
+          className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink p-6 sm:p-8 md:p-12 max-w-2xl w-full"
+        >
+          <div className="text-center mb-8">
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="inline-block mb-4"
+            >
+              <Heart strokeWidth={0} fill="currentColor" className="w-14 h-14 text-deep-crimson mx-auto" />
+            </motion.div>
+            <h2 className="font-serif text-3xl sm:text-4xl text-deep-crimson mb-2">Before we start...</h2>
+            <p className="text-charcoal/60 font-sans text-sm sm:text-base">Tell us a bit about yourself</p>
+          </div>
 
-  const question = questions[currentIdx]
+          {/* Gender */}
+          <div className="mb-8">
+            <p className="font-sans font-semibold text-charcoal text-sm mb-3 text-center">I am</p>
+            <div className="flex gap-3 justify-center">
+              {[
+                { value: 'male', label: 'Male', icon: '♂' },
+                { value: 'female', label: 'Female', icon: '♀' },
+              ].map((opt) => (
+                <motion.button
+                  key={opt.value}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setGender(opt.value)}
+                  className={`flex-1 max-w-[180px] py-4 rounded-2xl border-2 font-sans font-semibold text-base transition-all flex flex-col items-center gap-1 ${
+                    gender === opt.value
+                      ? 'border-deep-crimson bg-deep-crimson/10 text-deep-crimson shadow-elegant'
+                      : 'border-pink-shadow/30 text-charcoal/60 hover:border-soft-red'
+                  }`}
+                >
+                  <span className="text-2xl">{opt.icon}</span>
+                  <span>{opt.label}</span>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+
+          {/* Preference */}
+          <div className="mb-10">
+            <p className="font-sans font-semibold text-charcoal text-sm mb-3 text-center">I am interested in</p>
+            <div className="flex gap-3 justify-center">
+              {[
+                { value: 'men', label: 'Men', icon: '♂' },
+                { value: 'women', label: 'Women', icon: '♀' },
+              ].map((opt) => (
+                <motion.button
+                  key={opt.value}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setPreference(opt.value)}
+                  className={`flex-1 max-w-[180px] py-4 rounded-2xl border-2 font-sans font-semibold text-base transition-all flex flex-col items-center gap-1 ${
+                    preference === opt.value
+                      ? 'border-soft-red bg-soft-red/10 text-soft-red shadow-elegant'
+                      : 'border-pink-shadow/30 text-charcoal/60 hover:border-soft-red'
+                  }`}
+                >
+                  <span className="text-2xl">{opt.icon}</span>
+                  <span>{opt.label}</span>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+
+          <motion.button
+            whileHover={canProceed ? { scale: 1.03 } : {}}
+            whileTap={canProceed ? { scale: 0.97 } : {}}
+            onClick={() => canProceed && setPhase('quiz')}
+            disabled={!canProceed}
+            className={`w-full py-4 rounded-2xl font-sans font-bold text-base flex items-center justify-center gap-2 transition-all ${
+              canProceed
+                ? 'bg-gradient-to-r from-deep-crimson to-soft-red text-white shadow-elegant cursor-pointer'
+                : 'bg-gray-100 text-charcoal/30 cursor-not-allowed'
+            }`}
+          >
+            Continue to Quiz
+            <ChevronRight strokeWidth={2} className="w-5 h-5" />
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    )
+  }
+
+  // --- QUIZ PHASE ---
+  if (shuffledQuestions.length === 0) return null
+
+  const question = shuffledQuestions[currentIdx]
   const currentAnswer = answers[String(question.qid)] ?? 5.0
+  const fillPercent = (currentAnswer / 10) * 100
+  const totalSteps = shuffledQuestions.length
 
   const handleRatingChange = (value) => {
     setAnswers({ ...answers, [String(question.qid)]: parseFloat(value) })
   }
 
   const handleNext = async () => {
-    if (currentIdx < questions.length - 1) {
+    if (currentIdx < totalSteps - 1) {
+      setDirection(1)
       setCurrentIdx(currentIdx + 1)
     } else {
       setSubmitting(true)
       try {
-        await submitAnswers(userEmail, answers)
+        await submitAnswers(userEmail, answers, gender, preference)
         onComplete()
       } catch (err) {
         setError(err.message)
@@ -79,8 +197,15 @@ function QuizPage({ userEmail, onComplete }) {
 
   const handlePrev = () => {
     if (currentIdx > 0) {
+      setDirection(-1)
       setCurrentIdx(currentIdx - 1)
     }
+  }
+
+  const slideVariants = {
+    enter: (dir) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
   }
 
   return (
@@ -90,122 +215,157 @@ function QuizPage({ userEmail, onComplete }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-4 sm:p-6"
     >
-      <motion.div
-        key={currentIdx}
-        initial={{ x: 100, opacity: 0, scale: 0.95 }}
-        animate={{ x: 0, opacity: 1, scale: 1 }}
-        exit={{ x: -100, opacity: 0, scale: 0.95 }}
-        transition={{ type: "spring", bounce: 0.3 }}
-        className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink hover:shadow-pink-lg transition-all duration-500 p-6 sm:p-8 md:p-12 max-w-3xl w-full"
-      >
+      <div className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink p-6 sm:p-8 md:p-12 max-w-3xl w-full">
         {/* Progress */}
         <div className="mb-6 sm:mb-8">
           <div className="flex justify-between items-center mb-3">
             <span className="text-xs sm:text-sm font-sans text-charcoal/60">
-              Question {currentIdx + 1} of {questions.length}
+              Question {currentIdx + 1} of {totalSteps}
             </span>
             <span className="text-xs sm:text-sm font-sans font-semibold text-deep-crimson">
-              {Math.round(((currentIdx + 1) / questions.length) * 100)}%
+              {Math.round(((currentIdx + 1) / totalSteps) * 100)}%
             </span>
           </div>
-          <div className="h-2 bg-pink-shadow/20 rounded-full overflow-hidden relative">
+          <div className="h-2.5 bg-pink-shadow/20 rounded-full overflow-hidden relative">
             <motion.div
-              initial={{ width: 0 }}
-              animate={{
-                width: `${((currentIdx + 1) / questions.length) * 100}%`
-              }}
-              className="h-full bg-gradient-to-r from-deep-crimson to-soft-red relative"
+              animate={{ width: `${((currentIdx + 1) / totalSteps) * 100}%` }}
+              transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+              className="h-full bg-gradient-to-r from-deep-crimson to-soft-red rounded-full relative"
             >
               <motion.div
-                className="absolute inset-0 bg-white/30"
+                className="absolute inset-0 bg-white/25"
                 animate={{ x: ['-100%', '100%'] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
               />
             </motion.div>
           </div>
         </div>
 
-        {/* Question */}
-        <div className="text-center mb-8">
+        {/* Question - animated swap */}
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
+            key={question.qid}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="text-center mb-8"
           >
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-deep-crimson mb-6 leading-relaxed px-4">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-deep-crimson mb-10 leading-relaxed px-4">
               {question.question}
             </h2>
-          </motion.div>
 
-          <style>{`
-            .heart-slider::-webkit-slider-thumb {
-              appearance: none;
-              width: 40px;
-              height: 40px;
-              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23DC143C'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E");
-              background-size: contain;
-              background-repeat: no-repeat;
-              background-position: center;
-              cursor: pointer;
-              filter: drop-shadow(0 4px 10px rgba(220, 20, 60, 0.5));
-              transition: all 0.2s ease;
-            }
-            .heart-slider::-webkit-slider-thumb:hover {
-              transform: scale(1.2) rotate(5deg);
-              filter: drop-shadow(0 6px 15px rgba(220, 20, 60, 0.7));
-            }
-            .heart-slider::-webkit-slider-thumb:active {
-              transform: scale(1.15) rotate(-5deg);
-            }
-            .heart-slider::-moz-range-thumb {
-              width: 40px;
-              height: 40px;
-              border: none;
-              background-color: transparent;
-              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23DC143C'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E");
-              background-size: contain;
-              background-repeat: no-repeat;
-              background-position: center;
-              cursor: pointer;
-              filter: drop-shadow(0 4px 10px rgba(220, 20, 60, 0.5));
-              transition: all 0.2s ease;
-            }
-            .heart-slider::-moz-range-thumb:hover {
-              transform: scale(1.2) rotate(5deg);
-              filter: drop-shadow(0 6px 15px rgba(220, 20, 60, 0.7));
-            }
-            .heart-slider::-webkit-slider-runnable-track {
-              height: 12px;
-              border-radius: 999px;
-            }
-            .heart-slider::-moz-range-track {
-              height: 12px;
-              border-radius: 999px;
-            }
-          `}</style>
-          <div className="max-w-2xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-4">
-              <span className="text-3xl font-bold text-deep-crimson font-serif">
-                {currentAnswer.toFixed(1)}
-              </span>
+            <style>{`
+              .quiz-slider {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 100%;
+                height: 10px;
+                border-radius: 999px;
+                outline: none;
+                cursor: pointer;
+                transition: box-shadow 0.3s ease;
+              }
+              .quiz-slider:focus {
+                box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.15);
+              }
+              .quiz-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #DC143C, #FF6B81);
+                border: 3px solid white;
+                box-shadow: 0 4px 14px rgba(220, 20, 60, 0.45);
+                cursor: pointer;
+                transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+              }
+              .quiz-slider::-webkit-slider-thumb:hover {
+                transform: scale(1.2);
+                box-shadow: 0 6px 20px rgba(220, 20, 60, 0.6);
+              }
+              .quiz-slider::-webkit-slider-thumb:active {
+                transform: scale(1.1);
+                box-shadow: 0 3px 10px rgba(220, 20, 60, 0.5);
+              }
+              .quiz-slider::-moz-range-thumb {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #DC143C, #FF6B81);
+                border: 3px solid white;
+                box-shadow: 0 4px 14px rgba(220, 20, 60, 0.45);
+                cursor: pointer;
+                transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+              }
+              .quiz-slider::-moz-range-thumb:hover {
+                transform: scale(1.2);
+                box-shadow: 0 6px 20px rgba(220, 20, 60, 0.6);
+              }
+              .quiz-slider::-webkit-slider-runnable-track {
+                height: 10px;
+                border-radius: 999px;
+              }
+              .quiz-slider::-moz-range-track {
+                height: 10px;
+                border-radius: 999px;
+                background: transparent;
+              }
+            `}</style>
+
+            <div className="max-w-2xl mx-auto px-4 sm:px-6">
+              {/* Score display */}
+              <motion.div
+                key={currentAnswer}
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                className="text-center mb-5"
+              >
+                <span className="text-4xl font-bold text-deep-crimson font-serif">
+                  {currentAnswer.toFixed(1)}
+                </span>
+              </motion.div>
+
+              {/* Slider with gradient fill */}
+              <div className="relative">
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={currentAnswer}
+                  onChange={(e) => handleRatingChange(e.target.value)}
+                  className="quiz-slider"
+                  style={{
+                    background: `linear-gradient(to right, #DC143C ${fillPercent}%, #f3d5da ${fillPercent}%)`
+                  }}
+                />
+              </div>
+
+              {/* Labels */}
+              <div className="flex justify-between mt-3 px-1">
+                <span className="text-xs font-sans font-semibold text-charcoal/40">Strongly Disagree</span>
+                <span className="text-xs font-sans font-semibold text-charcoal/40">Strongly Agree</span>
+              </div>
+
+              {/* Dot indicators */}
+              <div className="flex justify-between mt-2 px-1">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                  <div
+                    key={n}
+                    className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
+                      n <= currentAnswer ? 'bg-deep-crimson/60' : 'bg-pink-shadow/30'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-            <motion.div whileHover={{ scale: 1.01 }} className="relative">
-              <input
-                type="range"
-                min="0"
-                max="10"
-                step="0.1"
-                value={currentAnswer}
-                onChange={(e) => handleRatingChange(e.target.value)}
-                className="heart-slider w-full h-3 bg-gradient-to-r from-pink-shadow/30 via-pink-shadow/40 to-soft-red/50 rounded-full appearance-none cursor-pointer shadow-inner"
-              />
-            </motion.div>
-            <div className="flex justify-between mt-4 px-2">
-              <span className="text-sm font-sans font-semibold text-charcoal/60">0.0 - Low</span>
-              <span className="text-sm font-sans font-semibold text-charcoal/60">10.0 - High</span>
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Navigation */}
         <div className="flex justify-between items-center pt-6 border-t border-pink-shadow/10">
@@ -214,19 +374,24 @@ function QuizPage({ userEmail, onComplete }) {
             whileTap={{ scale: 0.95 }}
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="bg-white border-2 border-pink-shadow/30 rounded-full p-4 hover:border-soft-red hover:shadow-elegant transition-all disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="bg-white border-2 border-pink-shadow/30 rounded-full p-4 hover:border-soft-red hover:shadow-elegant transition-all disabled:opacity-20 disabled:cursor-not-allowed"
           >
             <ChevronLeft strokeWidth={2} className="w-5 h-5 text-charcoal" />
           </motion.button>
 
-          <div className="text-center">
-            <p className="text-xs font-sans text-charcoal/50 mb-1">
-              Question {currentIdx + 1} of {questions.length}
-            </p>
+          <div className="flex gap-1">
+            {shuffledQuestions.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === currentIdx ? 'w-5 bg-deep-crimson' : i < currentIdx ? 'w-1.5 bg-deep-crimson/40' : 'w-1.5 bg-pink-shadow/30'
+                }`}
+              />
+            ))}
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.05, x: 2, boxShadow: "0 10px 30px rgba(220, 20, 60, 0.3)" }}
+            whileHover={{ scale: 1.05, x: 2, boxShadow: '0 10px 30px rgba(220, 20, 60, 0.3)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleNext}
             disabled={submitting}
@@ -234,13 +399,13 @@ function QuizPage({ userEmail, onComplete }) {
           >
             {submitting
               ? 'Saving...'
-              : currentIdx < questions.length - 1
+              : currentIdx < totalSteps - 1
               ? 'Next'
               : 'Finish'}
             <ChevronRight strokeWidth={2} className="w-5 h-5" />
           </motion.button>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }

@@ -1,7 +1,7 @@
 import re
 from fastapi import APIRouter, HTTPException
 from config import supabase
-from models import UserCreate, AnswerSubmit, UserResponse
+from models import UserCreate, AnswerSubmit, UserResponse, compute_batch
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -44,23 +44,37 @@ async def register_user(user: UserCreate):
 
     existing = supabase.table("users").select("*").eq("email", user.email).execute()
     if existing.data:
-        return existing.data[0]
+        row = existing.data[0]
+        if row.get("year") and row.get("rollno"):
+            row["batch"] = compute_batch(row["rollno"], row["year"])
+        return row
 
-    parsed = parse_email(user.email)
+    # Try to parse year/rollno, default to None if fails
+    try:
+        parsed = parse_email(user.email)
+        year = parsed["year"]
+        rollno = parsed["rollno"]
+    except HTTPException:
+        year = None
+        rollno = None
+
     cleaned_name = clean_name(user.name)
 
     new_user = {
         "email": user.email,
         "name": cleaned_name,
-        "year": parsed["year"],
-        "rollno": parsed["rollno"],
+        "year": year,
+        "rollno": rollno,
         "answers": None,
         "score": 0.0,
     }
     result = supabase.table("users").insert(new_user).execute()
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to create user")
-    return result.data[0]
+    row = result.data[0]
+    if row.get("year") and row.get("rollno"):
+        row["batch"] = compute_batch(row["rollno"], row["year"])
+    return row
 
 
 @router.get("/check/{email}")
@@ -70,16 +84,22 @@ async def check_user(email: str):
     if not result.data:
         return {"exists": False, "onboarded": False}
     user = result.data[0]
+    if user.get("year") and user.get("rollno"):
+        user["batch"] = compute_batch(user["rollno"], user["year"])
     onboarded = user.get("answers") is not None
     return {"exists": True, "onboarded": onboarded, "user": user}
 
 
 @router.post("/submit-answers")
 async def submit_answers(data: AnswerSubmit):
-    """Submit quiz answers for a user (onboarding)."""
+    """Submit quiz answers, gender, and preference for a user (onboarding)."""
     result = (
         supabase.table("users")
-        .update({"answers": data.answers})
+        .update({
+            "answers": data.answers,
+            "gender": data.gender,
+            "preference": data.preference,
+        })
         .eq("email", data.email)
         .execute()
     )
@@ -89,25 +109,22 @@ async def submit_answers(data: AnswerSubmit):
 
 
 @router.get("/search")
-async def search_users(q: str = ""):
-    """Search users by name for the match-making page."""
-    if not q:
-        result = supabase.table("users").select("email,name,year,rollno").execute()
-    else:
-        result = (
-            supabase.table("users")
-            .select("email,name,year,rollno")
-            .ilike("name", f"%{q}%")
-            .execute()
-        )
-    return result.data
-
-
-@router.get("/all")
-async def get_all_users():
-    """Get all users (for student list in match page)."""
-    result = supabase.table("users").select("email,name,year,rollno").execute()
-    return result.data
+async def search_users(q: str = "", limit: int = 15):
+    """Search users by name for the match-making page. Returns max `limit` results."""
+    if not q or len(q.strip()) < 2:
+        return []
+    result = (
+        supabase.table("users")
+        .select("email,name,year,rollno")
+        .ilike("name", f"%{q}%")
+        .limit(limit)
+        .execute()
+    )
+    users = result.data
+    for u in users:
+        if u.get("year") and u.get("rollno"):
+            u["batch"] = compute_batch(u["rollno"], u["year"])
+    return users
 
 
 @router.get("/{email}", response_model=UserResponse)
@@ -116,4 +133,7 @@ async def get_user(email: str):
     result = supabase.table("users").select("*").eq("email", email).execute()
     if not result.data:
         raise HTTPException(status_code=404, detail="User not found")
-    return result.data[0]
+    row = result.data[0]
+    if row.get("year") and row.get("rollno"):
+        row["batch"] = compute_batch(row["rollno"], row["year"])
+    return row

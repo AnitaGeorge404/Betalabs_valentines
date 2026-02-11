@@ -23,10 +23,10 @@ export function checkUser(email) {
   return request(`/users/check/${encodeURIComponent(email)}`);
 }
 
-export function submitAnswers(email, answers) {
+export function submitAnswers(email, answers, gender, preference) {
   return request("/users/submit-answers", {
     method: "POST",
-    body: JSON.stringify({ email, answers }),
+    body: JSON.stringify({ email, answers, gender, preference }),
   });
 }
 
@@ -36,10 +36,6 @@ export function getQuestions() {
 
 export function searchUsers(query = "") {
   return request(`/users/search?q=${encodeURIComponent(query)}`);
-}
-
-export function getAllUsers() {
-  return request("/users/all");
 }
 
 export function getUser(email) {
@@ -63,4 +59,8 @@ export function getCouplesLeaderboard(limit = 20) {
 
 export function getUsersLeaderboard(limit = 20) {
   return request(`/match/leaderboard/users?limit=${limit}`);
+}
+
+export function getCooldown(email) {
+  return request(`/match/cooldown/${encodeURIComponent(email)}`);
 }
