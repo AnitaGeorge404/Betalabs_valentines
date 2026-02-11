@@ -4,8 +4,8 @@ Run this after setting up your DATABASE_URL in .env to verify everything works.
 """
 import os
 from dotenv import load_dotenv
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import psycopg
+from psycopg.rows import dict_row
 
 load_dotenv()
 
@@ -14,14 +14,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 def test_connection():
     """Test basic connection to PostgreSQL."""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        cursor.execute("SELECT version();")
-        version = cursor.fetchone()[0]
-        print(f"✅ Successfully connected to PostgreSQL!")
-        print(f"   Version: {version}\n")
-        cursor.close()
-        conn.close()
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT version();")
+                version = cursor.fetchone()[0]
+                print(f"✅ Successfully connected to PostgreSQL!")
+                print(f"   Version: {version}\n")
         return True
     except Exception as e:
         print(f"❌ Connection failed: {e}")
@@ -30,47 +28,43 @@ def test_connection():
 def test_tables():
     """Check if all required tables exist."""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        
-        tables = ['users', 'questions', 'scores']
-        print("Checking tables:")
-        for table in tables:
-            cursor.execute(
-                """
-                SELECT COUNT(*) as count 
-                FROM information_schema.tables 
-                WHERE table_name = %s
-                """,
-                (table,)
-            )
-            result = cursor.fetchone()
-            if result['count'] > 0:
-                cursor.execute(f"SELECT COUNT(*) as row_count FROM {table}")
-                row_count = cursor.fetchone()['row_count']
-                print(f"  ✅ {table} table exists ({row_count} rows)")
-            else:
-                print(f"  ❌ {table} table NOT FOUND")
-        
-        cursor.close()
-        conn.close()
-        print()
+        with psycopg.connect(DATABASE_URL) as conn:
+            conn.row_factory = dict_row
+            cursor = conn.cursor()
+            
+            tables = ['users', 'questions', 'scores']
+            print("Checking tables:")
+            for table in tables:
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) as count 
+                    FROM information_schema.tables 
+                    WHERE table_name = %s
+                    """,
+                    (table,)
+                )
+                result = cursor.fetchone()
+                if result['count'] > 0:
+                    cursor.execute(f"SELECT COUNT(*) as row_count FROM {table}")
+                    row_count = cursor.fetchone()['row_count']
+                    print(f"  ✅ {table} table exists ({row_count} rows)")
+                else:
+                    print(f"  ❌ {table} table NOT FOUND")
+            
+            print()
     except Exception as e:
         print(f"❌ Table check failed: {e}\n")
 
 def test_jsonb_operations():
     """Test JSONB operations work correctly."""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        
-        # Test JSON query on users table
-        cursor.execute("SELECT COUNT(*) as count FROM users WHERE answers IS NOT NULL")
-        result = cursor.fetchone()
-        print(f"JSONB test: {result['count']} users with answers stored ✅\n")
-        
-        cursor.close()
-        conn.close()
+        with psycopg.connect(DATABASE_URL) as conn:
+            conn.row_factory = dict_row
+            with conn.cursor() as cursor:
+                # Test JSON query on users table
+                cursor.execute("SELECT COUNT(*) as count FROM users WHERE answers IS NOT NULL")
+                result = cursor.fetchone()
+                print(f"JSONB test: {result['count']} users with answers stored ✅\n")
     except Exception as e:
         print(f"❌ JSONB test failed: {e}\n")
 
