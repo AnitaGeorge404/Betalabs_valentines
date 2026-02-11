@@ -33,7 +33,7 @@ function AuthPage({ onAuth }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-neo-white"
     >
       {/* Animated Background Hearts */}
       <div className="absolute inset-0 pointer-events-none">
@@ -59,7 +59,7 @@ function AuthPage({ onAuth }) {
             }}
           >
             <Heart
-              className="text-deep-crimson"
+              className="text-soft-red"
               size={30 + i * 5}
               fill="currentColor"
               opacity={0.1}
@@ -72,7 +72,7 @@ function AuthPage({ onAuth }) {
         initial={{ y: 50, opacity: 0, scale: 0.9 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, type: "spring", bounce: 0.4 }}
-        className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink hover:shadow-pink-lg transition-all duration-500 p-6 sm:p-8 md:p-12 max-w-md w-full relative z-10"
+        className="neo-card p-6 sm:p-8 md:p-12 max-w-md w-full relative z-10"
       >
         <div className="text-center mb-6 sm:mb-8">
           <motion.div
@@ -83,11 +83,13 @@ function AuthPage({ onAuth }) {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="inline-block relative"
           >
-            <Heart
-              strokeWidth={0}
-              fill="currentColor"
-              className="w-16 h-16 sm:w-20 sm:h-20 text-deep-crimson mx-auto mb-4 drop-shadow-lg"
-            />
+            <div className="neo-circle w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
+              <Heart
+                strokeWidth={0}
+                fill="currentColor"
+                className="w-12 h-12 sm:w-16 sm:h-16 text-soft-red"
+              />
+            </div>
             <motion.div
               className="absolute -top-2 -right-2"
               animate={{
@@ -109,51 +111,50 @@ function AuthPage({ onAuth }) {
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-soft-red" fill="currentColor" />
             </motion.div>
           </motion.div>
-          <h1 className="font-script text-4xl sm:text-5xl text-deep-crimson mb-3">
-            Cupid's Ledger
-          </h1>
-          <p className="text-charcoal/70 font-sans text-sm">
-            Find your perfect match on campus
-          </p>
+          
+          <div className="neo-pressed py-3 px-6 mb-3 inline-block rounded-full">
+            <h1 className="font-script text-4xl sm:text-5xl text-soft-red">
+              Cupid's Ledger
+            </h1>
+          </div>
+          
+          <div className="neo-flat py-2 px-4 inline-block rounded-full">
+            <p className="text-charcoal/70 font-sans text-sm">
+              Find your perfect match on campus
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center font-sans">
+          <div className="mb-4 p-3 neo-pressed rounded-xl text-soft-red text-sm text-center font-sans">
             {error}
           </div>
         )}
 
         <motion.button
-          whileHover={{ scale: 1.03, y: -3, boxShadow: "0 20px 50px rgba(255, 182, 193, 0.4)" }}
-          whileTap={{ scale: 0.97 }}
-          animate={{
-            boxShadow: [
-              "0 10px 30px rgba(255, 182, 193, 0.15)",
-              "0 15px 40px rgba(255, 182, 193, 0.25)",
-              "0 10px 30px rgba(255, 182, 193, 0.15)"
-            ]
-          }}
-          transition={{
-            boxShadow: { duration: 2.5, repeat: Infinity, ease: "easeInOut" }
-          }}
+          whileHover={{ scale: 1.03, y: -3 }}
+          whileTap={{ scale: 0.97, boxShadow: "inset 2px 2px 5px rgba(163, 177, 198, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.9)" }}
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white border-2 border-pink-shadow/30 rounded-2xl p-4 flex items-center justify-center gap-3 hover:border-soft-red hover:shadow-elegant transition-all disabled:opacity-50"
+          className="w-full neo-btn-primary rounded-2xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50"
         >
           <motion.div
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
+            className="neo-circle w-8 h-8 flex items-center justify-center bg-white/20"
           >
-            <Mail strokeWidth={1.2} className="w-5 h-5 text-deep-crimson" />
+            <Mail strokeWidth={1.2} className="w-4 h-4 text-white" />
           </motion.div>
-          <span className="font-sans font-semibold text-charcoal">
+          <span className="font-sans font-semibold text-white">
             {loading ? 'Signing in...' : 'Continue with Google'}
           </span>
         </motion.button>
 
-        <p className="text-center text-xs text-charcoal/50 mt-6 font-sans">
-          Only college email addresses are accepted
-        </p>
+        <div className="neo-pressed mt-6 py-2 px-4 rounded-full mx-auto w-fit">
+          <p className="text-center text-xs text-charcoal/70 font-sans">
+            Only college email addresses are accepted
+          </p>
+        </div>
       </motion.div>
     </motion.div>
   )

@@ -13,6 +13,9 @@ export default {
         'pink-shadow': '#FFB6C1',
         'charcoal': '#2D2D2D',
         'rose-gold': '#B76E79',
+        'neo-white': '#ffffff',
+        'neo-shadow-dark': 'rgba(163, 177, 198, 0.6)',
+        'neo-shadow-light': 'rgba(255, 255, 255, 0.9)',
       },
       fontFamily: {
         'script': ['Dancing Script', 'cursive'],
@@ -48,6 +51,12 @@ export default {
         'pink': '0 20px 50px rgba(255, 182, 193, 0.3)',
         'pink-lg': '0 25px 60px rgba(255, 182, 193, 0.4)',
         'elegant': '0 10px 40px rgba(183, 110, 121, 0.15)',
+        'neo-flat': '5px 5px 10px rgba(163, 177, 198, 0.6), -5px -5px 10px rgba(255, 255, 255, 0.9)',
+        'neo-pressed': 'inset 2px 2px 5px rgba(163, 177, 198, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.9)',
+        'neo-btn': '5px 5px 10px rgba(163, 177, 198, 0.6), -5px -5px 10px rgba(255, 255, 255, 0.9)',
+        'neo-btn-hover': '6px 6px 12px rgba(163, 177, 198, 0.6), -6px -6px 12px rgba(255, 255, 255, 0.9)',
+        'neo-red': '5px 5px 10px rgba(220, 20, 60, 0.4), -3px -3px 6px rgba(255, 107, 129, 0.8)',
+        'neo-red-hover': '6px 6px 12px rgba(220, 20, 60, 0.5), -4px -4px 8px rgba(255, 107, 129, 0.9)',
       },
       backgroundSize: {
         '200': '200% 200%',

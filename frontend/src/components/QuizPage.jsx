@@ -40,13 +40,16 @@ function QuizPage({ userEmail, onComplete }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-neo-white">
         <motion.div
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-deep-crimson font-serif text-2xl"
+          className="neo-card p-8 text-center"
         >
-          Loading questions...
+          <div className="neo-circle w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <Heart strokeWidth={0} fill="currentColor" className="w-8 h-8 text-soft-red" />
+          </div>
+          <p className="text-soft-red font-serif text-2xl">Loading questions...</p>
         </motion.div>
       </div>
     )
@@ -54,15 +57,17 @@ function QuizPage({ userEmail, onComplete }) {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white rounded-3xl shadow-pink p-8 text-center max-w-md">
-          <p className="text-red-500 font-sans mb-4">{error}</p>
-          <button
+      <div className="min-h-screen flex items-center justify-center bg-neo-white">
+        <div className="neo-card p-8 text-center max-w-md">
+          <p className="text-soft-red font-sans mb-4 neo-pressed p-3 rounded-xl">{error}</p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95, boxShadow: "var(--neo-inset-shadow)" }}
             onClick={() => { setError(null); window.location.reload() }}
-            className="bg-deep-crimson text-white rounded-xl px-6 py-2 font-sans"
+            className="neo-btn-primary text-white rounded-xl px-6 py-2 font-sans"
           >
             Retry
-          </button>
+          </motion.button>
         </div>
       </div>
     )
@@ -76,13 +81,13 @@ function QuizPage({ userEmail, onComplete }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen flex items-center justify-center p-4 sm:p-6"
+        className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-neo-white"
       >
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', bounce: 0.3 }}
-          className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink p-6 sm:p-8 md:p-12 max-w-2xl w-full"
+          className="neo-card p-6 sm:p-8 md:p-12 max-w-2xl w-full"
         >
           <div className="text-center mb-8">
             <motion.div
@@ -90,15 +95,23 @@ function QuizPage({ userEmail, onComplete }) {
               transition={{ duration: 2, repeat: Infinity }}
               className="inline-block mb-4"
             >
-              <Heart strokeWidth={0} fill="currentColor" className="w-14 h-14 text-deep-crimson mx-auto" />
+              <div className="neo-circle w-20 h-20 mx-auto flex items-center justify-center">
+                <Heart strokeWidth={0} fill="currentColor" className="w-12 h-12 text-soft-red" />
+              </div>
             </motion.div>
-            <h2 className="font-serif text-3xl sm:text-4xl text-deep-crimson mb-2">Before we start...</h2>
-            <p className="text-charcoal/60 font-sans text-sm sm:text-base">Tell us a bit about yourself</p>
+            <div className="neo-pressed py-3 px-6 mb-3 inline-block rounded-full">
+              <h2 className="font-serif text-3xl sm:text-4xl text-soft-red">Before we start...</h2>
+            </div>
+            <div className="neo-flat py-2 px-4 inline-block rounded-full">
+              <p className="text-charcoal/70 font-sans text-sm sm:text-base">Tell us a bit about yourself</p>
+            </div>
           </div>
 
           {/* Gender */}
           <div className="mb-8">
-            <p className="font-sans font-semibold text-charcoal text-sm mb-3 text-center">I am</p>
+            <div className="neo-pressed py-2 px-4 rounded-full mb-3 mx-auto w-fit">
+              <p className="font-sans font-semibold text-charcoal text-sm text-center">I am</p>
+            </div>
             <div className="flex gap-3 justify-center">
               {[
                 { value: 'male', label: 'Male', icon: '♂' },
@@ -107,12 +120,12 @@ function QuizPage({ userEmail, onComplete }) {
                 <motion.button
                   key={opt.value}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.95, boxShadow: "var(--neo-inset-shadow)" }}
                   onClick={() => setGender(opt.value)}
-                  className={`flex-1 max-w-[180px] py-4 rounded-2xl border-2 font-sans font-semibold text-base transition-all flex flex-col items-center gap-1 ${
+                  className={`flex-1 max-w-[180px] py-4 rounded-2xl font-sans font-semibold text-base transition-all flex flex-col items-center gap-1 ${
                     gender === opt.value
-                      ? 'border-deep-crimson bg-deep-crimson/10 text-deep-crimson shadow-elegant'
-                      : 'border-pink-shadow/30 text-charcoal/60 hover:border-soft-red'
+                      ? 'neo-btn-primary text-white'
+                      : 'neo-btn text-charcoal/70'
                   }`}
                 >
                   <span className="text-2xl">{opt.icon}</span>
@@ -124,7 +137,9 @@ function QuizPage({ userEmail, onComplete }) {
 
           {/* Preference */}
           <div className="mb-10">
-            <p className="font-sans font-semibold text-charcoal text-sm mb-3 text-center">I am interested in</p>
+            <div className="neo-pressed py-2 px-4 rounded-full mb-3 mx-auto w-fit">
+              <p className="font-sans font-semibold text-charcoal text-sm text-center">I am interested in</p>
+            </div>
             <div className="flex gap-3 justify-center">
               {[
                 { value: 'men', label: 'Men', icon: '♂' },
@@ -133,12 +148,12 @@ function QuizPage({ userEmail, onComplete }) {
                 <motion.button
                   key={opt.value}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.95, boxShadow: "var(--neo-inset-shadow)" }}
                   onClick={() => setPreference(opt.value)}
-                  className={`flex-1 max-w-[180px] py-4 rounded-2xl border-2 font-sans font-semibold text-base transition-all flex flex-col items-center gap-1 ${
+                  className={`flex-1 max-w-[180px] py-4 rounded-2xl font-sans font-semibold text-base transition-all flex flex-col items-center gap-1 ${
                     preference === opt.value
-                      ? 'border-soft-red bg-soft-red/10 text-soft-red shadow-elegant'
-                      : 'border-pink-shadow/30 text-charcoal/60 hover:border-soft-red'
+                      ? 'neo-btn-primary text-white'
+                      : 'neo-btn text-charcoal/70'
                   }`}
                 >
                   <span className="text-2xl">{opt.icon}</span>
@@ -149,14 +164,14 @@ function QuizPage({ userEmail, onComplete }) {
           </div>
 
           <motion.button
-            whileHover={canProceed ? { scale: 1.03 } : {}}
-            whileTap={canProceed ? { scale: 0.97 } : {}}
+            whileHover={canProceed ? { scale: 1.03, y: -2 } : {}}
+            whileTap={canProceed ? { scale: 0.97, boxShadow: "var(--neo-inset-shadow)" } : {}}
             onClick={() => canProceed && setPhase('quiz')}
             disabled={!canProceed}
             className={`w-full py-4 rounded-2xl font-sans font-bold text-base flex items-center justify-center gap-2 transition-all ${
               canProceed
-                ? 'bg-gradient-to-r from-deep-crimson to-soft-red text-white shadow-elegant cursor-pointer'
-                : 'bg-gray-100 text-charcoal/30 cursor-not-allowed'
+                ? 'neo-btn-primary text-white cursor-pointer'
+                : 'neo-pressed bg-gray-100 text-charcoal/30 cursor-not-allowed'
             }`}
           >
             Continue to Quiz
@@ -213,20 +228,24 @@ function QuizPage({ userEmail, onComplete }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-neo-white"
     >
-      <div className="bg-white rounded-[2rem] sm:rounded-[3rem] shadow-pink p-6 sm:p-8 md:p-12 max-w-3xl w-full">
+      <div className="neo-card p-6 sm:p-8 md:p-12 max-w-3xl w-full">
         {/* Progress */}
         <div className="mb-6 sm:mb-8">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-xs sm:text-sm font-sans text-charcoal/60">
-              Question {currentIdx + 1} of {totalSteps}
-            </span>
-            <span className="text-xs sm:text-sm font-sans font-semibold text-deep-crimson">
-              {Math.round(((currentIdx + 1) / totalSteps) * 100)}%
-            </span>
+            <div className="neo-pressed py-1 px-3 rounded-full">
+              <span className="text-xs sm:text-sm font-sans text-charcoal/70">
+                Question {currentIdx + 1} of {totalSteps}
+              </span>
+            </div>
+            <div className="neo-flat py-1 px-3 rounded-full">
+              <span className="text-xs sm:text-sm font-sans font-semibold text-soft-red">
+                {Math.round(((currentIdx + 1) / totalSteps) * 100)}%
+              </span>
+            </div>
           </div>
-          <div className="h-2.5 bg-pink-shadow/20 rounded-full overflow-hidden relative">
+          <div className="neo-pressed h-3 rounded-full overflow-hidden relative">
             <motion.div
               animate={{ width: `${((currentIdx + 1) / totalSteps) * 100}%` }}
               transition={{ type: 'spring', stiffness: 100, damping: 20 }}
