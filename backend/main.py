@@ -4,8 +4,14 @@ from fastapi.responses import JSONResponse
 from routes.users import router as users_router
 from routes.questions import router as questions_router
 from routes.matching import router as matching_router
+from config import init_db_pool
 
 app = FastAPI(title="Cupid's Ledger API", version="1.0.0")
+
+# Initialize database connection pool on startup
+@app.on_event("startup")
+async def startup_event():
+    init_db_pool()
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,6 +1,7 @@
 import re
+import json
 from fastapi import APIRouter, HTTPException
-from config import supabase
+from config import get_db_cursor
 from models import UserCreate, AnswerSubmit, UserResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -42,78 +43,91 @@ async def register_user(user: UserCreate):
             detail=f"Only @{ALLOWED_DOMAIN} emails are allowed"
         )
 
-    existing = supabase.table("users").select("*").eq("email", user.email).execute()
-    if existing.data:
-        return existing.data[0]
+    with get_db_cursor() as cursor:
+        # Check if user already exists
+        cursor.execute("SELECT * FROM users WHERE email = %s", (user.email,))
+        existing = cursor.fetchone()
+        if existing:
+            return existing
 
-    parsed = parse_email(user.email)
-    cleaned_name = clean_name(user.name)
+        # Parse email and clean name
+        parsed = parse_email(user.email)
+        cleaned_name = clean_name(user.name)
 
-    new_user = {
-        "email": user.email,
-        "name": cleaned_name,
-        "year": parsed["year"],
-        "rollno": parsed["rollno"],
-        "answers": None,
-        "score": 0.0,
-    }
-    result = supabase.table("users").insert(new_user).execute()
-    if not result.data:
-        raise HTTPException(status_code=500, detail="Failed to create user")
-    return result.data[0]
+        # Insert new user
+        cursor.execute(
+            """
+            INSERT INTO users (email, name, year, rollno, answers, score)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING *
+            """,
+            (user.email, cleaned_name, parsed["year"], parsed["rollno"], None, 0.0)
+        )
+        result = cursor.fetchone()
+        if not result:
+            raise HTTPException(status_code=500, detail="Failed to create user")
+        return result
 
 
 @router.get("/check/{email}")
 async def check_user(email: str):
     """Check if user exists and has completed onboarding."""
-    result = supabase.table("users").select("*").eq("email", email).execute()
-    if not result.data:
-        return {"exists": False, "onboarded": False}
-    user = result.data[0]
-    onboarded = user.get("answers") is not None
-    return {"exists": True, "onboarded": onboarded, "user": user}
+    with get_db_cursor(commit=False) as cursor:
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+        if not user:
+            return {"exists": False, "onboarded": False}
+        onboarded = user.get("answers") is not None
+        return {"exists": True, "onboarded": onboarded, "user": dict(user)}
 
 
 @router.post("/submit-answers")
 async def submit_answers(data: AnswerSubmit):
     """Submit quiz answers for a user (onboarding)."""
-    result = (
-        supabase.table("users")
-        .update({"answers": data.answers})
-        .eq("email", data.email)
-        .execute()
-    )
-    if not result.data:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"message": "Answers saved", "user": result.data[0]}
+    with get_db_cursor() as cursor:
+        cursor.execute(
+            """
+            UPDATE users 
+            SET answers = %s
+            WHERE email = %s
+            RETURNING *
+            """,
+            (json.dumps(data.answers), data.email)
+        )
+        result = cursor.fetchone()
+        if not result:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"message": "Answers saved", "user": dict(result)}
 
 
 @router.get("/search")
 async def search_users(q: str = ""):
     """Search users by name for the match-making page."""
-    if not q:
-        result = supabase.table("users").select("email,name,year,rollno").execute()
-    else:
-        result = (
-            supabase.table("users")
-            .select("email,name,year,rollno")
-            .ilike("name", f"%{q}%")
-            .execute()
-        )
-    return result.data
+    with get_db_cursor(commit=False) as cursor:
+        if not q:
+            cursor.execute("SELECT email, name, year, rollno FROM users")
+        else:
+            cursor.execute(
+                "SELECT email, name, year, rollno FROM users WHERE name ILIKE %s",
+                (f"%{q}%",)
+            )
+        return cursor.fetchall()
 
 
 @router.get("/all")
 async def get_all_users():
     """Get all users (for student list in match page)."""
-    result = supabase.table("users").select("email,name,year,rollno").execute()
-    return result.data
+    with get_db_cursor(commit=False) as cursor:
+        cursor.execute("SELECT email, name, year, rollno FROM users")
+        return cursor.fetchall()
 
 
 @router.get("/{email}", response_model=UserResponse)
 async def get_user(email: str):
     """Get a single user's profile."""
-    result = supabase.table("users").select("*").eq("email", email).execute()
-    if not result.data:
-        raise HTTPException(status_code=404, detail="User not found")
-    return result.data[0]
+    with get_db_cursor(commit=False) as cursor:
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        result = cursor.fetchone()
+        if not result:
+            raise HTTPException(status_code=404, detail="User not found")
+        return result

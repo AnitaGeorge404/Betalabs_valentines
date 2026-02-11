@@ -33,14 +33,9 @@ CREATE TABLE IF NOT EXISTS scores (
 -- Index for fast leaderboard queries
 CREATE INDEX IF NOT EXISTS idx_scores_matched ON scores(number_of_times_matched DESC);
 
--- Enable Row Level Security (allow all for anon key usage)
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow all for users" ON users FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for questions" ON questions FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for scores" ON scores FOR ALL USING (true) WITH CHECK (true);
+
+
 
 -- Seed questions
 INSERT INTO questions (qid, question, weightage) VALUES

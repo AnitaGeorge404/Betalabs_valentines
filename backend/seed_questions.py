@@ -1,8 +1,8 @@
 """
-Run this once to seed the questions table in Supabase.
+Run this once to seed the questions table in PostgreSQL.
 Usage: python seed_questions.py
 """
-from config import supabase
+from config import get_db_cursor
 
 QUESTIONS = [
     {"qid": 1, "question": "You catch feelings easily.", "weightage": 1.0},
@@ -21,13 +21,18 @@ QUESTIONS = [
 
 
 def seed():
-    for q in QUESTIONS:
-        existing = supabase.table("questions").select("*").eq("qid", q["qid"]).execute()
-        if existing.data:
-            print(f"Question {q['qid']} already exists, skipping.")
-            continue
-        result = supabase.table("questions").insert(q).execute()
-        print(f"Inserted question {q['qid']}: {result.data}")
+    with get_db_cursor() as cursor:
+        for q in QUESTIONS:
+            cursor.execute("SELECT * FROM questions WHERE qid = %s", (q["qid"],))
+            existing = cursor.fetchone()
+            if existing:
+                print(f"Question {q['qid']} already exists, skipping.")
+                continue
+            cursor.execute(
+                "INSERT INTO questions (qid, question, weightage) VALUES (%s, %s, %s)",
+                (q["qid"], q["question"], q["weightage"])
+            )
+            print(f"Inserted question {q['qid']}")
     print("Seeding complete!")
 
 
