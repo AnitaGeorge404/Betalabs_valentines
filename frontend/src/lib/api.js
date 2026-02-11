@@ -1,8 +1,45 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+// request function (defined below) will include auth token if present
+let authToken = null;
+
+export function setAuthToken(token) {
+  authToken = token;
+  try {
+    localStorage.setItem("auth_token", token);
+  } catch (e) {
+    // ignore
+  }
+}
+
+export function getAuthToken() {
+  if (authToken) return authToken;
+  try {
+    authToken = localStorage.getItem("auth_token");
+    return authToken;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function clearAuthToken() {
+  authToken = null;
+  try {
+    localStorage.removeItem("auth_token");
+  } catch (e) {
+    // ignore
+  }
+}
 
 async function request(path, options = {}) {
+  const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+  const token = getAuthToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers,
     ...options,
   });
   if (!res.ok) {

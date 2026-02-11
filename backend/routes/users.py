@@ -1,7 +1,7 @@
 import re
 import json
 from fastapi import APIRouter, HTTPException
-from config import get_db_cursor
+from config import get_db_cursor, ALLOWED_DOMAIN
 from models import UserCreate, AnswerSubmit, UserResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -31,13 +31,12 @@ def clean_name(name: str) -> str:
     return name.strip()
 
 
-ALLOWED_DOMAIN = "iiitkottayam.ac.in"
-
-
-@router.post("/register", response_model=UserResponse)
-async def register_user(user: UserCreate):
-    """Register a new user after Google Auth sign-in."""
-    if not user.email.endswith(f"@{ALLOWED_DOMAIN}"):
+def create_or_get_user(email: str, name: str):
+    """Create a user record if it doesn't exist and return the DB row.
+    This mirrors the logic previously in the POST /register endpoint and
+    can be reused by OAuth handlers.
+    """
+    if not email.endswith(f"@{ALLOWED_DOMAIN}"):
         raise HTTPException(
             status_code=403,
             detail=f"Only @{ALLOWED_DOMAIN} emails are allowed"
@@ -45,14 +44,14 @@ async def register_user(user: UserCreate):
 
     with get_db_cursor() as cursor:
         # Check if user already exists
-        cursor.execute("SELECT * FROM users WHERE email = %s", (user.email,))
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         existing = cursor.fetchone()
         if existing:
             return existing
 
         # Parse email and clean name
-        parsed = parse_email(user.email)
-        cleaned_name = clean_name(user.name)
+        parsed = parse_email(email)
+        cleaned_name = clean_name(name)
 
         # Insert new user
         cursor.execute(
@@ -61,12 +60,19 @@ async def register_user(user: UserCreate):
             VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING *
             """,
-            (user.email, cleaned_name, parsed["year"], parsed["rollno"], None, 0.0)
+            (email, cleaned_name, parsed["year"], parsed["rollno"], None, 0.0)
         )
         result = cursor.fetchone()
         if not result:
             raise HTTPException(status_code=500, detail="Failed to create user")
         return result
+
+
+@router.post("/register", response_model=UserResponse)
+async def register_user(user: UserCreate):
+    """Register a new user after Google Auth sign-in."""
+    # Delegate to helper so OAuth handlers can reuse the same logic
+    return create_or_get_user(user.email, user.name)
 
 
 @router.get("/check/{email}")

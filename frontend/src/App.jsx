@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Trophy, Search, User } from 'lucide-react'
-import { supabase } from './lib/supabase'
-import { registerUser, checkUser } from './lib/api'
+import { registerUser, checkUser, getAuthToken } from './lib/api'
 import { FloatingHearts } from './components/FloatingHearts'
 import { AuthPage } from './components/AuthPage'
 import { OnboardingPage } from './components/OnboardingPage'
@@ -12,91 +11,8 @@ import { Leaderboard } from './components/Leaderboard'
 import { Profile } from './components/Profile'
 import './App.css'
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('loading') // loading, auth, onboarding, quiz, main
-  const [mainTab, setMainTab] = useState('match') // match, leaderboard, profile
-  const [session, setSession] = useState(null)
-  const [userData, setUserData] = useState(null)
-
-  // Listen for Supabase auth state changes
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s)
-      if (s) {
-        handleAuthUser(s)
-      } else {
-        setCurrentPage('auth')
-      }
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s)
-      if (s) {
-        handleAuthUser(s)
-      } else {
-        setCurrentPage('auth')
-        setUserData(null)
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const handleAuthUser = async (s) => {
-    try {
-      const email = s.user.email
-
-      // Validate email domain
-      if (!email.endsWith('@iiitkottayam.ac.in')) {
-        await supabase.auth.signOut()
-        setCurrentPage('auth')
-        return
-      }
-
-      const name = s.user.user_metadata?.full_name || s.user.user_metadata?.name || email.split('@')[0]
-
-      // Register or get existing user
-      const user = await registerUser(email, name)
-      setUserData(user)
-
-      // Check if onboarded
-      const status = await checkUser(email)
-      if (status.onboarded) {
-        setCurrentPage('main')
-      } else {
-        setCurrentPage('onboarding')
-      }
-    } catch (err) {
-      console.error('Auth flow error:', err)
-      setCurrentPage('auth')
-    }
-  }
-
-  const handleOnboardingComplete = () => {
-    setCurrentPage('quiz')
-  }
-
-  const handleQuizComplete = async () => {
-    // Refresh user data after quiz
-    if (userData?.email) {
-      try {
-        const status = await checkUser(userData.email)
-        if (status.user) setUserData(status.user)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    setCurrentPage('main')
-  }
-
-  const handleLogout = () => {
-    setSession(null)
-    setUserData(null)
-    setCurrentPage('auth')
-  }
-
-  // Main App with Tabs
-  const MainApp = () => (
+function MainApp({ mainTab, setMainTab, userData, handleLogout }) {
+  return (
     <div className="min-h-screen pb-20 sm:pb-24">
       {/* Header */}
       <motion.div
@@ -198,6 +114,91 @@ function App() {
     </div>
   )
 
+}
+
+function App() {
+  const [currentPage, setCurrentPage] = useState('loading') // loading, auth, onboarding, quiz, main
+  const [mainTab, setMainTab] = useState('match') // match, leaderboard, profile
+  // session state (previously used with Supabase) removed; JWT/localStorage now used
+  const [userData, setUserData] = useState(null)
+
+  // Initialize auth from stored token/user (from OAuth flow)
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = getAuthToken()
+        if (!token) {
+          setCurrentPage('auth')
+          return
+        }
+
+        const stored = localStorage.getItem('user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          setUserData(parsed)
+          // Check onboarding status
+          try {
+            const status = await checkUser(parsed.email)
+            if (status.onboarded) setCurrentPage('main')
+            else setCurrentPage('onboarding')
+          } catch (e) {
+            console.error('Failed to check user:', e)
+            setCurrentPage('auth')
+          }
+        } else {
+          setCurrentPage('auth')
+        }
+      } catch (e) {
+        console.error(e)
+        setCurrentPage('auth')
+      }
+    })()
+  }, [])
+
+  const handleAuthUser = async ({ email, name }) => {
+    try {
+      // Persist minimal user locally
+      const user = { email, name }
+      setUserData(user)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      // Ensure user exists on backend (create if missing)
+      await registerUser(email, name)
+
+      // Check onboarding status
+      const status = await checkUser(email)
+      if (status.onboarded) setCurrentPage('main')
+      else setCurrentPage('onboarding')
+    } catch (err) {
+      console.error('Auth flow error:', err)
+      setCurrentPage('auth')
+    }
+  }
+
+  const handleOnboardingComplete = () => {
+    setCurrentPage('quiz')
+  }
+
+  const handleQuizComplete = async () => {
+    // Refresh user data after quiz
+    if (userData?.email) {
+      try {
+        const status = await checkUser(userData.email)
+        if (status.user) setUserData(status.user)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    setCurrentPage('main')
+  }
+
+  const handleLogout = () => {
+    setUserData(null)
+    setCurrentPage('auth')
+  }
+
+  // MainApp moved out of render to top-level to avoid recreating component each render
+
   // Loading screen
   if (currentPage === 'loading') {
     return (
@@ -219,7 +220,7 @@ function App() {
       {/* Main Content */}
       <div className="relative z-10">
         <AnimatePresence mode="wait">
-          {currentPage === 'auth' && <AuthPage key="auth" />}
+          {currentPage === 'auth' && <AuthPage key="auth" onAuth={handleAuthUser} />}
           {currentPage === 'onboarding' && (
             <OnboardingPage key="onboarding" onComplete={handleOnboardingComplete} />
           )}
@@ -230,7 +231,15 @@ function App() {
               onComplete={handleQuizComplete}
             />
           )}
-          {currentPage === 'main' && <MainApp key="main" />}
+          {currentPage === 'main' && (
+            <MainApp
+              key="main"
+              mainTab={mainTab}
+              setMainTab={setMainTab}
+              userData={userData}
+              handleLogout={handleLogout}
+            />
+          )}
         </AnimatePresence>
       </div>
     </div>

@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, Sparkles, Mail } from 'lucide-react'
-import { supabase } from '../lib/supabase'
-import { registerUser, checkUser } from '../lib/api'
+import { setAuthToken, API_URL } from '../lib/api'
 
 function AuthPage({ onAuth }) {
   const [loading, setLoading] = useState(false)
@@ -12,21 +11,49 @@ function AuthPage({ onAuth }) {
     setLoading(true)
     setError(null)
     try {
-      const { error: authError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-          queryParams: {
-            hd: 'iiitkottayam.ac.in',
-          },
-        },
-      })
-      if (authError) throw authError
+      // Redirect the browser to the backend OAuth login endpoint which
+      // will forward the user to Google and then back to the backend callback.
+      window.location.href = `${API_URL}/auth/login`
     } catch (err) {
       setError(err.message)
       setLoading(false)
     }
   }
+
+  // When backend redirects back to frontend it appends the token and user
+  // info in the URL fragment as: /#auth?token=...&email=...&name=...
+  // Parse that and finish login.
+  useEffect(() => {
+    try {
+      const hash = window.location.hash || ''
+      if (hash.startsWith('#auth')) {
+        const qs = hash.slice('#auth'.length)
+        const params = new URLSearchParams(qs.replace(/^\?/, ''))
+        const token = params.get('token')
+        const email = params.get('email')
+        const name = params.get('name')
+        if (token) {
+          setAuthToken(token)
+          if (onAuth) onAuth({ email, name })
+        }
+        // Clean the url
+        history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, [onAuth])
+
+  const hearts = useMemo(() => {
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 800
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800
+    const pseudo = (n) => (((n * 9301 + 49297) % 233280) / 233280)
+    return Array.from({ length: 8 }, (_, i) => ({
+      x: Math.floor(pseudo(i) * vw),
+      size: 30 + i * 5,
+      viewportHeight: vh,
+    }))
+  }, [])
 
   return (
     <motion.div
@@ -37,33 +64,24 @@ function AuthPage({ onAuth }) {
     >
       {/* Animated Background Hearts */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(8)].map((_, i) => (
+        {hearts.map((h, i) => (
           <motion.div
             key={i}
             className="absolute"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 800),
-              y: -50,
-              opacity: 0
-            }}
+            initial={{ x: h.x, y: -50, opacity: 0 }}
             animate={{
-              y: (typeof window !== 'undefined' ? window.innerHeight : 800) + 50,
+              y: h.viewportHeight + 50,
               opacity: [0, 0.3, 0.3, 0],
-              rotate: [0, 360]
+              rotate: [0, 360],
             }}
             transition={{
               duration: 15 + i * 2,
               repeat: Infinity,
               delay: i * 2,
-              ease: "linear"
+              ease: 'linear',
             }}
           >
-            <Heart
-              className="text-deep-crimson"
-              size={30 + i * 5}
-              fill="currentColor"
-              opacity={0.1}
-            />
+            <Heart className="text-deep-crimson" size={h.size} fill="currentColor" opacity={0.1} />
           </motion.div>
         ))}
       </div>

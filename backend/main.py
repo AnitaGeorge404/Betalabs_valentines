@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from routes.users import router as users_router
+from routes.auth import router as auth_router
 from routes.questions import router as questions_router
 from routes.matching import router as matching_router
 from config import init_db_pool
@@ -34,6 +35,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 app.include_router(users_router)
 app.include_router(questions_router)
 app.include_router(matching_router)
+app.include_router(auth_router)
 
 
 @app.get("/")

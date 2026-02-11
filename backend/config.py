@@ -8,6 +8,19 @@ load_dotenv()
 # Database configuration
 DATABASE_URL: str = os.getenv("DATABASE_URL")
 
+# OAuth / JWT configuration (set these in your environment)
+GOOGLE_OAUTH_CLIENT_ID: str = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
+GOOGLE_OAUTH_CLIENT_SECRET: str = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+OAUTH_REDIRECT_URI: str = os.getenv("OAUTH_REDIRECT_URI")
+ALLOWED_DOMAIN: str = os.getenv("ALLOWED_DOMAIN", "iiitkottayam.ac.in")
+
+# Frontend URL to redirect to after OAuth callback (e.g. http://localhost:5173)
+FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# JWT settings for issuing short-lived tokens to the frontend
+JWT_SECRET: str = os.getenv("JWT_SECRET", "please-change-me")
+JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+
 # Create a connection pool (min 2, max 10 connections)
 connection_pool = None
 
