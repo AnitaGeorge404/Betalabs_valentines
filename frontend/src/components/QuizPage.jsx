@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getQuestions, submitAnswers } from '../lib/api'
 import { DoodleDivider, SparkleCluster, InkSplatter } from './Doodles'
+import { LottieAccent } from './LottieAccent'
 import { mediumHaptic, lightHaptic, successHaptic } from '../lib/haptics'
 
 function shuffleArray(arr) {
@@ -83,8 +84,18 @@ function QuizPage({ userEmail, onComplete }) {
           initial={{ y: 24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', bounce: 0.3 }}
-          className="card-elevated px-6 sm:px-10 py-8 sm:py-12 max-w-lg w-full"
+          className="card-elevated px-6 sm:px-10 py-8 sm:py-12 max-w-lg w-full relative overflow-hidden"
         >
+          <LottieAccent
+            className="absolute -top-8 -right-5"
+            size={84}
+            opacity={0.28}
+            entranceDelay={0.2}
+            floatDistance={8}
+            floatDuration={5.8}
+            driftX={4}
+          />
+
           <div className="text-center mb-8">
             <h2 className="font-serif text-3xl sm:text-4xl text-wine mb-2">Before we start…</h2>
             <DoodleDivider className="max-w-[140px] mx-auto mb-3" />
@@ -216,7 +227,18 @@ function QuizPage({ userEmail, onComplete }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-4 sm:p-6"
     >
-      <div className="card-elevated px-6 sm:px-10 py-8 sm:py-12 max-w-2xl w-full">
+      <div className="card-elevated px-6 sm:px-10 py-8 sm:py-12 max-w-2xl w-full relative overflow-hidden">
+        <LottieAccent
+          className="absolute -top-8 left-2"
+          size={76}
+          opacity={0.22}
+          variant="pulse"
+          entranceDelay={0.15}
+          floatDistance={6}
+          floatDuration={7}
+          driftX={3}
+        />
+
         {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-3">

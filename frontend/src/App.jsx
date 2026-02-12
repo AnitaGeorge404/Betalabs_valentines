@@ -11,6 +11,7 @@ import { MatchFinder } from './components/MatchFinder'
 import { Leaderboard } from './components/Leaderboard'
 import { Profile } from './components/Profile'
 import { LottieAccent } from './components/LottieAccent'
+import { selectionHaptic, lightHaptic } from './lib/haptics'
 import './App.css'
 
 /* ─── inline SVG nav icons (hand-drawn doodle feel) ─── */
@@ -23,10 +24,9 @@ const NavSearch = ({ active }) => (
 const NavTrophy = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth={active ? 1.8 : 1.2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-    <path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
-    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
-    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+    <path d="M12 21s-7-4.35-9.2-8.26A5.4 5.4 0 0 1 12 5.8a5.4 5.4 0 0 1 9.2 6.94C19 16.65 12 21 12 21Z" />
+    <path d="M12 9.2v5.3" />
+    <path d="m9.7 12.2 2.3 2.3 2.3-2.3" />
   </svg>
 )
 const NavUser = ({ active }) => (
@@ -42,7 +42,7 @@ const HeartLogo = () => (
 )
 const StarIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="#620725">
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 )
 
@@ -152,7 +152,7 @@ function App() {
               )}
               <motion.button
                 whileTap={{ scale: 0.92 }}
-                onClick={() => setMainTab('profile')}
+                onClick={() => { lightHaptic(); setMainTab('profile') }}
                 className="w-8 h-8 rounded-full bg-wine flex items-center justify-center relative"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5EDE6"
@@ -179,7 +179,7 @@ function App() {
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', bounce: 0.25 }}
-        className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-5 sm:w-80 sm:mx-auto z-30 glass-nav"
+        className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-5 sm:w-80 sm:mx-auto z-30 glass-nav rounded-[1.8rem] border border-wine/10 overflow-hidden shadow-cinematic"
       >
         <div className="flex justify-around py-2">
           {[
@@ -192,7 +192,7 @@ function App() {
               <motion.button
                 key={id}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setMainTab(id)}
+                onClick={() => { selectionHaptic(); setMainTab(id) }}
                 className="relative flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl"
               >
                 {isActive && (
@@ -222,9 +222,13 @@ function App() {
   if (currentPage === 'loading') {
     return (
       <div className="min-h-screen bg-parchment flex flex-col items-center justify-center gap-3">
-        <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-          <HeartLogo />
-        </motion.div>
+        <LottieAccent
+          variant="loading"
+          size={122}
+          opacity={1}
+          float={false}
+          className="z-10"
+        />
         <span className="font-script text-wine/40 text-sm">Loading…</span>
       </div>
     )
@@ -234,8 +238,31 @@ function App() {
     <div className="min-h-screen bg-parchment relative overflow-hidden">
       <FloatingHearts />
       <ParticleField particleCount={36} />
-      <LottieAccent className="absolute top-20 left-2 sm:left-6 opacity-45 z-[1]" size={82} />
-      <LottieAccent className="absolute top-44 right-1 sm:right-5 opacity-40 z-[1]" size={96} />
+      {currentPage === 'main' && (
+        <>
+          <LottieAccent
+            className="absolute top-20 left-2 sm:left-6 z-[2]"
+            size={86}
+            opacity={0.52}
+            variant="pulse"
+            entranceDelay={0.1}
+            floatDistance={9}
+            floatDuration={6.5}
+            driftX={5}
+            rotateRange={4}
+          />
+          <LottieAccent
+            className="absolute top-44 right-1 sm:right-5 z-[2]"
+            size={96}
+            opacity={0.56}
+            variant="birds"
+            entranceDelay={0.2}
+            floatDistance={7}
+            floatDuration={7.2}
+            driftX={-4}
+          />
+        </>
+      )}
       <div className="relative z-10">
         <AnimatePresence mode="wait">
           {currentPage === 'auth' && <AuthPage key="auth" />}

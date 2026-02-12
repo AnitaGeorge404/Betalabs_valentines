@@ -38,8 +38,17 @@ function AuthPage({ onAuth }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
     >
-      <LottieAccent className="absolute -top-6 -right-5 sm:right-4 opacity-70" size={92} />
-      <LottieAccent className="absolute bottom-8 -left-3 sm:left-4 opacity-55" size={74} />
+      <LottieAccent
+        className="absolute -top-6 -right-5 sm:right-4"
+        size={94}
+        opacity={0.72}
+        variant="birds"
+        entranceDelay={0.1}
+        floatDistance={10}
+        floatDuration={4.6}
+        driftX={4}
+        rotateRange={4}
+      />
 
       {/* Corner doodles — fixed, subtle */}
       <DoodleCherub className="absolute top-6 left-6 opacity-10 hidden sm:block" size={90} />

@@ -3,6 +3,7 @@ import { User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { DoodleRose, DoodleDivider, DoodleCherub, PaperFold, InkSplatter, QuillPen } from './Doodles'
 import { ShimmerButton, FloatingMiniHearts } from './RomanticEffects'
+import { LottieAccent } from './LottieAccent'
 import { mediumHaptic, lightHaptic } from '../lib/haptics'
 
 /* Inline heart SVG */
@@ -32,6 +33,17 @@ function Profile({ user, onLogout }) {
   return (
     <div className="space-y-5">
       <div className="card-elevated p-6 sm:p-8 relative vintage-paper">
+        <LottieAccent
+          className="absolute top-2 right-2"
+          size={62}
+          opacity={0.2}
+          entranceDelay={0.15}
+          floatDistance={5}
+          floatDuration={6.4}
+          driftX={4}
+          rotateRange={3}
+        />
+
         {/* Paper fold corners */}
         <div className="absolute top-0 right-0 pointer-events-none opacity-30">
           <PaperFold size={36} corner="tr" />
@@ -81,7 +93,18 @@ function Profile({ user, onLogout }) {
         <DoodleDivider className="mx-auto mb-5" />
 
         {/* Best Match Notification */}
-        <div className="bg-cream border border-wine/8 rounded-organic p-5 mb-5">
+        <div className="bg-cream border border-wine/8 rounded-organic p-5 mb-5 relative overflow-hidden">
+          <LottieAccent
+            className="absolute top-1 right-1"
+            variant="birds"
+            size={60}
+            opacity={0.24}
+            entranceDelay={0.2}
+            floatDistance={4}
+            floatDuration={6.1}
+            driftX={3}
+          />
+
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-wine/8 flex items-center justify-center flex-shrink-0 mt-0.5">
               <HeartIcon className="text-wine" size={18} />

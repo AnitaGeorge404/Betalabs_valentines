@@ -29,8 +29,8 @@ export default {
       },
       fontFamily: {
         'script': ['"Dancing Script"', 'cursive'],
-        'serif': ['"Playfair Display"', 'Georgia', 'serif'],
-        'sans': ['"Montserrat"', 'Inter', 'system-ui', 'sans-serif'],
+        'serif': ['"Cormorant Garamond"', '"Playfair Display"', 'Georgia', 'serif'],
+        'sans': ['"DM Sans"', '"Montserrat"', 'Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

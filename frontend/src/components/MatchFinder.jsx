@@ -4,6 +4,7 @@ import { Search, User, X, Clock } from 'lucide-react'
 import { searchUsers, makeMatch, getCooldown } from '../lib/api'
 import { DoodleLock, DoodleKey, DoodleDivider, InkSplatter, QuillPen } from './Doodles'
 import { RomanticCard, ShimmerButton, FloatingMiniHearts } from './RomanticEffects'
+import { LottieAccent } from './LottieAccent'
 import { mediumHaptic, celebrationHaptic, selectionHaptic, heartbeatHaptic } from '../lib/haptics'
 
 function formatBatchYear(user) {
@@ -132,6 +133,27 @@ function MatchFinder({ userEmail, onMatchComplete }) {
             transition={{ type: 'spring', bounce: 0.5, duration: 0.8 }}
             className="card-elevated p-6 sm:p-8 text-center relative overflow-hidden shadow-cinematic"
           >
+            <LottieAccent
+              className="absolute top-2 left-2"
+              size={76}
+              opacity={0.3}
+              entranceDelay={0.1}
+              floatDistance={7}
+              floatDuration={4.4}
+              driftX={4}
+              rotateRange={4}
+            />
+            <LottieAccent
+              className="absolute bottom-1 right-1"
+              size={64}
+              opacity={0.24}
+              variant="pulse"
+              entranceDelay={0.2}
+              floatDistance={6}
+              floatDuration={5.8}
+              driftX={-3}
+            />
+
             {/* Confetti particles */}
             {[...Array(12)].map((_, i) => (
               <motion.div
@@ -219,7 +241,17 @@ function MatchFinder({ userEmail, onMatchComplete }) {
 
       {/* ---- Search & Selection ---- */}
       {!matchResult && (
-        <div className="card-elevated p-5 sm:p-7 space-y-5">
+        <div className="card-elevated p-5 sm:p-7 space-y-5 relative overflow-hidden">
+          <LottieAccent
+            className="absolute top-1 right-1"
+            size={72}
+            opacity={0.2}
+            entranceDelay={0.15}
+            floatDistance={6}
+            floatDuration={6.2}
+            driftX={5}
+          />
+
           {/* Ledger-line search bar */}
           <div ref={searchRef} className="relative">
             <div className="relative">
@@ -392,6 +424,17 @@ function MatchFinder({ userEmail, onMatchComplete }) {
         <div className="absolute -top-0.5 right-1/3 w-12 h-3 bg-wine/[0.05] rounded-b-sm transform rotate-1" />
 
         <div className="p-6 text-center relative">
+          <LottieAccent
+            className="absolute top-0 left-1/2 -translate-x-1/2"
+            variant="birds"
+            size={72}
+            opacity={0.36}
+            entranceDelay={0.1}
+            floatDistance={8}
+            floatDuration={6.8}
+            driftX={3}
+          />
+
           <motion.div
             animate={{ y: [0, -4, 0], rotate: [0, 3, -3, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}

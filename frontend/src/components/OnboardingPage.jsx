@@ -49,7 +49,16 @@ function OnboardingPage({ onComplete }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-6"
     >
-      <LottieAccent className="absolute top-6 right-6 opacity-50" size={78} />
+      <LottieAccent
+        className="absolute top-6 right-6"
+        size={82}
+        opacity={0.56}
+        entranceDelay={0.15}
+        floatDistance={12}
+        floatDuration={6}
+        driftX={5}
+        rotateRange={5}
+      />
 
       <div className="card-elevated px-8 sm:px-12 py-10 sm:py-14 max-w-xl w-full relative overflow-hidden">
         {/* Subtle corner decoration */}
