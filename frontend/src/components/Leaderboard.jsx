@@ -47,13 +47,25 @@ function Leaderboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <motion.div
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="font-serif text-lg text-wine/60"
-        >
-          Loading leaderboard…
-        </motion.div>
+        <div className="text-center relative card-elevated px-8 py-7 w-full max-w-sm">
+          <LottieAccent
+            className="mx-auto"
+            variant="flying"
+            size={120}
+            opacity={0.95}
+            floatDistance={10}
+            floatDuration={4.8}
+            driftX={7}
+            rotateRange={4}
+          />
+          <motion.p
+            animate={{ opacity: [0.45, 1, 0.45] }}
+            transition={{ duration: 1.8, repeat: Infinity }}
+            className="font-serif text-xl text-wine/70 mt-2"
+          >
+            Love rankings are loading…
+          </motion.p>
+        </div>
       </div>
     )
   }
@@ -132,7 +144,7 @@ function Leaderboard() {
               <div className="text-center py-6 relative">
                 <LottieAccent
                   className="mx-auto"
-                  variant="enamored"
+                  variant="loading"
                   size={90}
                   opacity={0.5}
                   floatDistance={7}

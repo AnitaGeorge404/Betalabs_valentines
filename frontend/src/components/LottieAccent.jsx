@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import enamoredHeart from '../assets/animations/Red cute enamored heart.json'
 import birdPair from '../assets/animations/Bird pair love and flying sky.json'
 import heartLoading from '../assets/animations/Heart Loading.json'
+import flyingHeart from '../assets/animations/Flying heart.json'
 import { romanticPulseLottie } from '../lib/romanticLottieData'
 
 function LottieAccent({
@@ -23,6 +24,7 @@ function LottieAccent({
     pulse: romanticPulseLottie,
     birds: birdPair,
     loading: heartLoading,
+    flying: flyingHeart,
   }
   const animationData = animationDataByVariant[variant] || enamoredHeart
 

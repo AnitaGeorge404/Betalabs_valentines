@@ -33,6 +33,13 @@ body {
   min-height: 100vh;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  body.heart-cursor-enabled,
+  body.heart-cursor-enabled * {
+    cursor: none !important;
+  }
+}
+
 /* Paper texture overlay WITH DRAMATIC VIGNETTE */
 body::before {
   content: '';
@@ -451,11 +458,6 @@ body::after {
   border-width: 0 0 24px 24px;
   border-color: transparent transparent #D5C7B8 transparent;
   box-shadow: -2px 2px 4px rgba(98, 7, 37, 0.1);
-}
-
-/* Quill pen cursor on inputs */
-.quill-cursor {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23620725" stroke-width="2"><path d="M3 21c8-8 16-16 18-18M5 19l-2 2"/></svg>') 2 18, text;
 }
 
 /* DRAMATIC EFFECTS */

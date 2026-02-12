@@ -11,6 +11,7 @@ import { MatchFinder } from './components/MatchFinder'
 import { Leaderboard } from './components/Leaderboard'
 import { Profile } from './components/Profile'
 import { LottieAccent } from './components/LottieAccent'
+import { FlyingHeartCursor } from './components/FlyingHeartCursor'
 import { selectionHaptic, lightHaptic } from './lib/haptics'
 import './App.css'
 
@@ -236,33 +237,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-parchment relative overflow-hidden">
+      <FlyingHeartCursor />
       <FloatingHearts />
       <ParticleField particleCount={36} />
-      {currentPage === 'main' && (
-        <>
-          <LottieAccent
-            className="absolute top-20 left-2 sm:left-6 z-[2]"
-            size={86}
-            opacity={0.52}
-            variant="pulse"
-            entranceDelay={0.1}
-            floatDistance={9}
-            floatDuration={6.5}
-            driftX={5}
-            rotateRange={4}
-          />
-          <LottieAccent
-            className="absolute top-44 right-1 sm:right-5 z-[2]"
-            size={96}
-            opacity={0.56}
-            variant="birds"
-            entranceDelay={0.2}
-            floatDistance={7}
-            floatDuration={7.2}
-            driftX={-4}
-          />
-        </>
-      )}
       <div className="relative z-10">
         <AnimatePresence mode="wait">
           {currentPage === 'auth' && <AuthPage key="auth" />}
