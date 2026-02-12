@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Trophy, Search, User, Star } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import { registerUser, checkUser } from './lib/api'
 import { FloatingHearts } from './components/FloatingHearts'
@@ -12,79 +11,86 @@ import { Leaderboard } from './components/Leaderboard'
 import { Profile } from './components/Profile'
 import './App.css'
 
+/* ─── inline SVG nav icons (hand-drawn doodle feel) ─── */
+const NavSearch = ({ active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth={active ? 1.8 : 1.2} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" />
+  </svg>
+)
+const NavTrophy = ({ active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth={active ? 1.8 : 1.2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+  </svg>
+)
+const NavUser = ({ active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth={active ? 1.8 : 1.2} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" />
+  </svg>
+)
+const HeartLogo = () => (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#620725" className="flex-shrink-0">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+)
+const StarIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="#620725">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+)
+
 function App() {
-  const [currentPage, setCurrentPage] = useState('loading') // loading, auth, onboarding, quiz, main
-  const [mainTab, setMainTab] = useState('match') // match, leaderboard, profile
+  const [currentPage, setCurrentPage] = useState('loading')
+  const [mainTab, setMainTab] = useState('match')
   const [session, setSession] = useState(null)
   const [userData, setUserData] = useState(null)
 
-  // Listen for Supabase auth state changes
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
-      if (s) {
-        handleAuthUser(s)
-      } else {
-        setCurrentPage('auth')
-      }
+      if (s) handleAuthUser(s)
+      else setCurrentPage('auth')
     })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s)
-      if (s) {
-        handleAuthUser(s)
-      } else {
-        setCurrentPage('auth')
-        setUserData(null)
-      }
+      if (s) handleAuthUser(s)
+      else { setCurrentPage('auth'); setUserData(null) }
     })
-
     return () => subscription.unsubscribe()
   }, [])
 
   const handleAuthUser = async (s) => {
     try {
       const email = s.user.email
-
-      // Validate email domain
       if (!email.endsWith('@iiitkottayam.ac.in')) {
         await supabase.auth.signOut()
         setCurrentPage('auth')
         return
       }
-
       const name = s.user.user_metadata?.full_name || s.user.user_metadata?.name || email.split('@')[0]
-
-      // Register or get existing user
       const user = await registerUser(email, name)
       setUserData(user)
-
-      // Check if onboarded
       const status = await checkUser(email)
-      if (status.onboarded) {
-        setCurrentPage('main')
-      } else {
-        setCurrentPage('onboarding')
-      }
+      setCurrentPage(status.onboarded ? 'main' : 'onboarding')
     } catch (err) {
       console.error('Auth flow error:', err)
       setCurrentPage('auth')
     }
   }
 
-  const handleOnboardingComplete = () => {
-    setCurrentPage('quiz')
-  }
+  const handleOnboardingComplete = () => setCurrentPage('quiz')
 
   const handleQuizComplete = async () => {
-    // Refresh user data after quiz
     if (userData?.email) {
       try {
         const status = await checkUser(userData.email)
         if (status.user) setUserData(status.user)
-      } catch (e) {
-        console.error(e)
-      }
+      } catch (e) { console.error(e) }
     }
     setCurrentPage('main')
   }
@@ -94,9 +100,7 @@ function App() {
     try {
       const status = await checkUser(userData.email)
       if (status.user) setUserData(status.user)
-    } catch (e) {
-      console.error(e)
-    }
+    } catch (e) { console.error(e) }
   }
 
   const handleLogout = () => {
@@ -105,54 +109,48 @@ function App() {
     setCurrentPage('auth')
   }
 
-  // Main App with Tabs
+  /* ─── Main App Shell ─── */
   const MainApp = () => (
-    <div className="min-h-screen pb-20 sm:pb-24">
-      {/* Header */}
-      <motion.div
+    <div className="min-h-screen pb-24 sm:pb-28">
+      {/* Header — parchment with wine accent */}
+      <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-white shadow-sm sticky top-0 z-20 border-b border-pink-shadow/10 backdrop-blur-lg bg-white/95"
+        className="sticky top-0 z-20 bg-parchment/90 backdrop-blur-md border-b border-wine/8"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <motion.div
-                animate={{
-                  scale: [1, 1.15, 1],
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Heart strokeWidth={0} fill="currentColor" className="w-6 h-6 sm:w-8 sm:h-8 text-deep-crimson" />
-              </motion.div>
-              <h1 className="font-script text-2xl sm:text-3xl text-deep-crimson">Cupid's Ledger</h1>
+            <div className="flex items-center gap-2">
+              <HeartLogo />
+              <h1 className="font-script text-2xl sm:text-3xl text-wine tracking-wide">Cupid's Ledger</h1>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {userData?.score != null && (
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-deep-crimson/10 to-soft-red/10 rounded-xl px-3 py-1.5">
-                  <Star strokeWidth={1.5} className="w-4 h-4 text-soft-red" fill="currentColor" />
-                  <span className="font-sans font-bold text-deep-crimson text-sm">
+                <div className="flex items-center gap-1 bg-wine/6 rounded-full px-2.5 py-1">
+                  <StarIcon />
+                  <span className="font-sans font-bold text-wine text-xs">
                     {Math.round(userData.score || 0)}
                   </span>
-                  <span className="font-sans text-charcoal/50 text-xs hidden sm:inline">pts</span>
+                  <span className="font-sans text-ink/30 text-[0.55rem] hidden sm:inline">pts</span>
                 </div>
               )}
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                whileTap={{ scale: 0.95 }}
+              <motion.button
+                whileTap={{ scale: 0.92 }}
                 onClick={() => setMainTab('profile')}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-deep-crimson to-soft-red flex items-center justify-center cursor-pointer shadow-elegant"
+                className="w-8 h-8 rounded-full bg-wine flex items-center justify-center relative"
               >
-                <User strokeWidth={1.2} size={18} className="text-white sm:w-5 sm:h-5" />
-              </motion.div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5EDE6"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 1 0-16 0" />
+                </svg>
+              </motion.button>
             </div>
           </div>
         </div>
-      </motion.div>
+      </motion.header>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Page Content */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 py-6">
         <AnimatePresence mode="wait">
           {mainTab === 'match' && <MatchFinder key="match" userEmail={userData?.email} onMatchComplete={refreshUserData} />}
           {mainTab === 'leaderboard' && <Leaderboard key="leaderboard" />}
@@ -160,97 +158,70 @@ function App() {
         </AnimatePresence>
       </div>
 
-      {/* Bottom Navigation */}
-      <motion.div
+      {/* Bottom Navigation — floating glassmorphic pill */}
+      <motion.nav
         initial={{ y: 100 }}
         animate={{ y: 0 }}
-        transition={{ type: "spring", bounce: 0.3 }}
-        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-pink-shadow/20 shadow-elegant z-20"
+        transition={{ type: 'spring', bounce: 0.25 }}
+        className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-5 sm:w-80 sm:mx-auto z-30 glass-nav"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex justify-around py-3 sm:py-4">
-            {[
-              { id: 'match', icon: Search, label: 'Find Match' },
-              { id: 'leaderboard', icon: Trophy, label: 'Leaderboard' },
-              { id: 'profile', icon: User, label: 'Profile' }
-            ].map((tab) => {
-              const Icon = tab.icon
-              const isActive = mainTab === tab.id
-
-              return (
-                <motion.button
-                  key={tab.id}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setMainTab(tab.id)}
-                  className="relative flex flex-col items-center gap-1 px-4 sm:px-6 py-2 rounded-2xl transition-all"
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTabIndicator"
-                      className="absolute inset-0 bg-deep-crimson rounded-2xl"
-                      transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
-                    />
-                  )}
+        <div className="flex justify-around py-2">
+          {[
+            { id: 'match', Icon: NavSearch, label: 'Find Match' },
+            { id: 'leaderboard', Icon: NavTrophy, label: 'Leaderboard' },
+            { id: 'profile', Icon: NavUser, label: 'Profile' },
+          ].map(({ id, Icon, label }) => {
+            const isActive = mainTab === id
+            return (
+              <motion.button
+                key={id}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setMainTab(id)}
+                className="relative flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl"
+              >
+                {isActive && (
                   <motion.div
-                    animate={isActive ? {
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 5, -5, 0]
-                    } : {}}
-                    transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
-                    className="relative z-10"
-                  >
-                    <Icon
-                      strokeWidth={1.2}
-                      className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? 'text-white' : 'text-charcoal/60'}`}
-                    />
-                  </motion.div>
-                  <span className={`text-[10px] sm:text-xs font-sans font-semibold relative z-10 ${
-                    isActive ? 'text-white' : 'text-charcoal/60'
-                  }`}>
-                    {tab.label}
-                  </span>
-                </motion.button>
-              )
-            })}
-          </div>
+                    layoutId="navPill"
+                    className="absolute inset-0 bg-wine rounded-2xl"
+                    transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }}
+                  />
+                )}
+                <span className={`relative z-10 ${isActive ? 'text-cream' : 'text-ink/45'}`}>
+                  <Icon active={isActive} />
+                </span>
+                <span className={`relative z-10 text-[0.55rem] font-sans font-semibold tracking-wide ${
+                  isActive ? 'text-cream' : 'text-ink/40'
+                }`}>
+                  {label}
+                </span>
+              </motion.button>
+            )
+          })}
         </div>
-      </motion.div>
+      </motion.nav>
     </div>
   )
 
-  // Loading screen
+  /* ─── Loading ─── */
   if (currentPage === 'loading') {
     return (
-      <div className="min-h-screen bg-light-pink flex items-center justify-center">
-        <motion.div
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <Heart strokeWidth={0} fill="currentColor" className="w-16 h-16 text-deep-crimson" />
+      <div className="min-h-screen bg-parchment flex flex-col items-center justify-center gap-3">
+        <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+          <HeartLogo />
         </motion.div>
+        <span className="font-script text-wine/40 text-sm">Loading…</span>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-light-pink relative overflow-hidden">
+    <div className="min-h-screen bg-parchment relative overflow-hidden">
       <FloatingHearts />
-
-      {/* Main Content */}
       <div className="relative z-10">
         <AnimatePresence mode="wait">
           {currentPage === 'auth' && <AuthPage key="auth" />}
-          {currentPage === 'onboarding' && (
-            <OnboardingPage key="onboarding" onComplete={handleOnboardingComplete} />
-          )}
-          {currentPage === 'quiz' && (
-            <QuizPage
-              key="quiz"
-              userEmail={userData?.email}
-              onComplete={handleQuizComplete}
-            />
-          )}
+          {currentPage === 'onboarding' && <OnboardingPage key="onboarding" onComplete={handleOnboardingComplete} />}
+          {currentPage === 'quiz' && <QuizPage key="quiz" userEmail={userData?.email} onComplete={handleQuizComplete} />}
           {currentPage === 'main' && <MainApp key="main" />}
         </AnimatePresence>
       </div>

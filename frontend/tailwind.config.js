@@ -7,59 +7,58 @@ export default {
   theme: {
     extend: {
       colors: {
-        'deep-crimson': '#800000',
-        'soft-red': '#DC143C',
-        'light-pink': '#FFF5F7',
-        'pink-shadow': '#FFB6C1',
+        'parchment': '#E2D5CA',
+        'parchment-light': '#EDE5DC',
+        'parchment-dark': '#D4C4B5',
+        'wine': '#620725',
+        'wine-light': '#7A1030',
+        'crimson': '#910D28',
+        'crimson-light': '#A91535',
         'charcoal': '#2D2D2D',
+        'charcoal-light': '#4A4A4A',
+        'ink': '#3B2F2F',
         'rose-gold': '#B76E79',
-        'neo-white': '#ffffff',
-        'neo-shadow-dark': 'rgba(163, 177, 198, 0.6)',
-        'neo-shadow-light': 'rgba(255, 255, 255, 0.9)',
+        'cream': '#F5EDE6',
+        // Legacy aliases
+        'deep-crimson': '#620725',
+        'soft-red': '#910D28',
+        'light-pink': '#E2D5CA',
+        'pink-shadow': '#B76E79',
       },
       fontFamily: {
-        'script': ['Dancing Script', 'cursive'],
-        'serif': ['Playfair Display', 'serif'],
-        'sans': ['Montserrat', 'Inter', 'system-ui', 'sans-serif'],
+        'script': ['"Dancing Script"', 'cursive'],
+        'serif': ['"Playfair Display"', 'Georgia', 'serif'],
+        'sans': ['"Montserrat"', 'Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'float-delayed': 'float 6s ease-in-out infinite 2s',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'slide-fade-in': 'slide-fade-in 0.6s ease-out',
-        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'fade-in-up': 'fadeInUp 0.6s ease-out',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-          '50%': { transform: 'translateY(-20px) rotate(5deg)' },
+          '50%': { transform: 'translateY(-12px) rotate(3deg)' },
         },
-        'slide-fade-in': {
-          '0%': { transform: 'translateX(100%) scale(0.95)', opacity: '0' },
-          '100%': { transform: 'translateX(0) scale(1)', opacity: '1' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { 
-            boxShadow: '0 0 20px rgba(255, 77, 109, 0.3), 0 0 40px rgba(255, 193, 209, 0.2)' 
-          },
-          '50%': { 
-            boxShadow: '0 0 30px rgba(255, 77, 109, 0.5), 0 0 60px rgba(255, 193, 209, 0.3)' 
-          },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
       boxShadow: {
-        'pink': '0 20px 50px rgba(255, 182, 193, 0.3)',
-        'pink-lg': '0 25px 60px rgba(255, 182, 193, 0.4)',
-        'elegant': '0 10px 40px rgba(183, 110, 121, 0.15)',
-        'neo-flat': '5px 5px 10px rgba(163, 177, 198, 0.6), -5px -5px 10px rgba(255, 255, 255, 0.9)',
-        'neo-pressed': 'inset 2px 2px 5px rgba(163, 177, 198, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.9)',
-        'neo-btn': '5px 5px 10px rgba(163, 177, 198, 0.6), -5px -5px 10px rgba(255, 255, 255, 0.9)',
-        'neo-btn-hover': '6px 6px 12px rgba(163, 177, 198, 0.6), -6px -6px 12px rgba(255, 255, 255, 0.9)',
-        'neo-red': '5px 5px 10px rgba(220, 20, 60, 0.4), -3px -3px 6px rgba(255, 107, 129, 0.8)',
-        'neo-red-hover': '6px 6px 12px rgba(220, 20, 60, 0.5), -4px -4px 8px rgba(255, 107, 129, 0.9)',
+        'editorial': '0 4px 24px rgba(98, 7, 37, 0.08)',
+        'editorial-lg': '0 8px 40px rgba(98, 7, 37, 0.12)',
+        'editorial-hover': '0 12px 48px rgba(98, 7, 37, 0.16)',
+        'card': '0 2px 12px rgba(98, 7, 37, 0.06)',
+        'card-hover': '0 8px 32px rgba(98, 7, 37, 0.12)',
+        'glass': '0 8px 32px rgba(98, 7, 37, 0.08), inset 0 0 0 1px rgba(255,255,255,0.1)',
+        'elegant': '0 10px 40px rgba(98, 7, 37, 0.1)',
+        'pink': '0 20px 50px rgba(98, 7, 37, 0.08)',
       },
-      backgroundSize: {
-        '200': '200% 200%',
+      borderRadius: {
+        'organic': '1.25rem',
+        'organic-lg': '1.75rem',
       },
       backdropBlur: {
         xs: '2px',

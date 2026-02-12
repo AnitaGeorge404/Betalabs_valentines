@@ -1,29 +1,43 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Heart, Star, Trophy, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
+import { DoodleEnvelope, DoodleKey, DoodleCherub, DoodleDivider } from './Doodles'
 
 const onboardingSteps = [
   {
-    title: "Welcome to Cupid's Ledger",
-    description: "Discover your perfect match through our unique compatibility quiz and see who your campus crushes are!",
-    icon: Heart
+    title: "Welcome to the Ledger",
+    description: "A bespoke matchmaking journal for IIIT Kottayam. Answer honestly, match boldly, and let Cupid keep score.",
+    Doodle: DoodleCherub,
+    doodleSize: 90,
   },
   {
-    title: "Answer Questions Honestly",
-    description: "Rate your preferences from 0-10 to help us find the best matches for you.",
-    icon: Star
+    title: "Unlock Compatibility",
+    description: "Rate your preferences from 0-10 on curated questions. Your answers paint a portrait only your match can see.",
+    Doodle: DoodleKey,
+    doodleSize: 70,
   },
   {
-    title: "Find Your Match",
-    description: "Search through students, create matches, and climb the leaderboard!",
-    icon: Trophy
-  }
+    title: "Write Your Entry",
+    description: "Search students, create matches, and climb the leaderboard. Every entry in the ledger tells a story.",
+    Doodle: DoodleEnvelope,
+    doodleSize: 70,
+  },
 ]
 
 function OnboardingPage({ onComplete }) {
   const [step, setStep] = useState(0)
+  const [dir, setDir] = useState(1)
   const current = onboardingSteps[step]
-  const StepIcon = current.icon
+  const DoodleIcon = current.Doodle
+
+  const goNext = () => { setDir(1); setStep(s => s + 1) }
+  const goPrev = () => { setDir(-1); setStep(s => s - 1) }
+
+  const variants = {
+    enter: (d) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
+  }
 
   return (
     <motion.div
@@ -32,81 +46,96 @@ function OnboardingPage({ onComplete }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-6"
     >
-      <motion.div
-        key={step}
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: -100, opacity: 0 }}
-        className="bg-white rounded-[3rem] shadow-pink p-12 max-w-2xl w-full"
-      >
-        <div className="text-center mb-8">
-          <motion.div
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="inline-block"
-          >
-            <StepIcon
-              strokeWidth={1.2}
-              className="w-24 h-24 text-soft-red mx-auto mb-6"
-            />
-          </motion.div>
-          <h2 className="font-serif text-4xl text-deep-crimson mb-4">
-            {current.title}
-          </h2>
-          <p className="text-charcoal/70 font-sans text-lg max-w-md mx-auto">
-            {current.description}
-          </p>
+      <div className="card-elevated px-8 sm:px-12 py-10 sm:py-14 max-w-xl w-full relative overflow-hidden">
+        {/* Subtle corner decoration */}
+        <div className="absolute top-4 right-4 opacity-[0.06]">
+          <DoodleCherub size={100} />
         </div>
 
-        <div className="flex justify-center gap-2 mb-8">
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.div
+            key={step}
+            custom={dir}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="text-center"
+          >
+            {/* Doodle illustration */}
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              className="inline-block mb-6"
+            >
+              <DoodleIcon size={current.doodleSize} className="mx-auto opacity-60" />
+            </motion.div>
+
+            <h2 className="font-serif text-3xl sm:text-4xl text-wine mb-3 leading-tight">
+              {current.title}
+            </h2>
+
+            <DoodleDivider className="max-w-[160px] mx-auto mb-4" />
+
+            <p className="text-ink/55 font-sans text-sm sm:text-base leading-relaxed max-w-sm mx-auto">
+              {current.description}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Step dots */}
+        <div className="flex justify-center gap-2 mt-8 mb-8">
           {onboardingSteps.map((_, index) => (
-            <div
+            <motion.div
               key={index}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === step
-                  ? 'bg-deep-crimson w-8'
-                  : 'bg-pink-shadow/30'
-              }`}
+              animate={{
+                width: index === step ? 28 : 8,
+                backgroundColor: index === step ? '#620725' : 'rgba(98,7,37,0.15)',
+              }}
+              className="h-2 rounded-full"
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             />
           ))}
         </div>
 
+        {/* Navigation */}
         <div className="flex justify-between items-center">
           {step > 0 ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setStep(step - 1)}
-              className="bg-white border-2 border-pink-shadow/30 rounded-full p-3 hover:border-soft-red transition-all"
+              onClick={goPrev}
+              className="btn-outline rounded-full p-3"
             >
-              <ChevronLeft strokeWidth={1.2} className="w-5 h-5 text-charcoal" />
+              <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
             </motion.button>
           ) : (
-            <div />
+            <div className="w-11" />
           )}
 
           {step < onboardingSteps.length - 1 ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setStep(step + 1)}
-              className="bg-deep-crimson rounded-full p-3 shadow-elegant"
+              onClick={goNext}
+              className="btn-wine rounded-full p-3"
             >
-              <ChevronRight strokeWidth={1.2} className="w-5 h-5 text-white" />
+              <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-cream" />
             </motion.button>
           ) : (
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={onComplete}
-              className="bg-deep-crimson text-white rounded-2xl px-8 py-3 font-sans font-semibold shadow-elegant flex items-center gap-2"
+              className="btn-wine rounded-xl px-7 py-3 font-sans font-semibold text-sm flex items-center gap-2 tracking-wide"
             >
-              Start Quiz
-              <ArrowRight strokeWidth={1.2} className="w-5 h-5" />
+              Begin Quiz
+              <ArrowRight strokeWidth={1.5} className="w-4 h-4" />
             </motion.button>
           )}
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
