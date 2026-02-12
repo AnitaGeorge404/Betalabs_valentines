@@ -141,3 +141,128 @@ export function DoodleCorners({ children, className = '' }) {
     </div>
   )
 }
+
+// ---- NEW Creative Elements ----
+
+export function WaxSeal({ className = '', size = 60 }) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Wax circle with texture */}
+      <circle cx="40" cy="40" r="32" fill="#620725" opacity="0.85" />
+      <circle cx="40" cy="40" r="32" stroke="#8B1538" strokeWidth="1.5" opacity="0.6" />
+      {/* Drips */}
+      <path d="M40 72c-2 3-4 5-4 5M46 73c1 2 2 4 2 4M52 70c2 2 3 4 3 4" stroke="#620725" strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
+      {/* Heart emblem */}
+      <path d="M40 32c-2-3-6-4-6 0s6 8 6 8 6-5 6-8-4-3-6 0z" fill="#E2D5CA" opacity="0.9" />
+      {/* Decorative initials C + L */}
+      <text x="30" y="50" fontFamily="Dancing Script, cursive" fontSize="12" fill="#E2D5CA" opacity="0.7">C</text>
+      <text x="47" y="50" fontFamily="Dancing Script, cursive" fontSize="12" fill="#E2D5CA" opacity="0.7">L</text>
+      {/* Texture lines */}
+      <path d="M12 38c8 0 16-2 24-2M16 45c6 0 12 1 18 1" stroke="#8B1538" strokeWidth="0.8" opacity="0.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function InkSplatter({ className = '', size = 40, variant = 1 }) {
+  if (variant === 1) {
+    return (
+      <svg className={className} width={size} height={size} viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="8" fill="#620725" opacity="0.15" />
+        <circle cx="18" cy="22" r="3" fill="#620725" opacity="0.12" />
+        <circle cx="32" cy="28" r="4" fill="#620725" opacity="0.1" />
+        <circle cx="26" cy="18" r="2" fill="#620725" opacity="0.18" />
+        <circle cx="20" cy="30" r="2.5" fill="#620725" opacity="0.13" />
+        <path d="M25 17l-1-5M33 25l5-2M25 33l2 4" stroke="#620725" strokeWidth="0.8" opacity="0.08" strokeLinecap="round" />
+      </svg>
+    )
+  }
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="25" cy="25" r="6" fill="#620725" opacity="0.12" />
+      <circle cx="30" cy="20" r="3" fill="#620725" opacity="0.1" />
+      <circle cx="19" cy="27" r="3.5" fill="#620725" opacity="0.14" />
+      <circle cx="28" cy="32" r="2" fill="#620725" opacity="0.11" />
+    </svg>
+  )
+}
+
+export function VintageStamp({ className = '', size = 50, text = "MATCHED" }) {
+  return (
+    <svg className={className} width={size} height={size * 0.7} viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Stamp border (perforated edge) */}
+      <rect x="5" y="5" width="90" height="60" stroke="#620725" strokeWidth="2" strokeDasharray="3 3" rx="2" opacity="0.4" />
+      <rect x="8" y="8" width="84" height="54" stroke="#620725" strokeWidth="1" rx="1" opacity="0.25" />
+      {/* Text */}
+      <text x="50" y="40" fontFamily="Montserrat, sans-serif" fontSize="13" fontWeight="800" fill="#620725" opacity="0.35" textAnchor="middle" letterSpacing="2">{text}</text>
+      {/* Decorative stars */}
+      <circle cx="20" cy="20" r="2" fill="#620725" opacity="0.2" />
+      <circle cx="80" cy="20" r="2" fill="#620725" opacity="0.2" />
+      <circle cx="20" cy="50" r="2" fill="#620725" opacity="0.2" />
+      <circle cx="80" cy="50" r="2" fill="#620725" opacity="0.2" />
+    </svg>
+  )
+}
+
+export function PaperFold({ className = '', size = 60, corner = 'tr' }) {
+  const transforms = {
+    tr: 'translate(0, 0)',
+    tl: 'scale(-1, 1) translate(-60, 0)',
+    br: 'scale(1, -1) translate(0, -60)',
+    bl: 'scale(-1, -1) translate(-60, -60)',
+  }
+  
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g transform={transforms[corner]}>
+        <path d="M60 0L40 0L60 20Z" fill="#D5C7B8" />
+        <path d="M60 0L40 0L60 20Z" fill="#620725" opacity="0.04" />
+        <line x1="60" y1="0" x2="40" y2="0" stroke="#620725" strokeWidth="0.5" opacity="0.15" />
+        <line x1="60" y1="0" x2="60" y2="20" stroke="#620725" strokeWidth="0.5" opacity="0.15" />
+        <line x1="40" y1="0" x2="60" y2="20" stroke="#620725" strokeWidth="0.5" opacity="0.2" strokeDasharray="1 1" />
+      </g>
+    </svg>
+  )
+}
+
+export function QuillPen({ className = '', size = 50 }) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Feather shaft */}
+      <path d="M10 50c8-8 16-16 24-28s10-18 12-20" stroke="#620725" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Feather vanes */}
+      <path d="M14 46c-3 1-5 0-4-2M18 40c-4 0-6-1-5-3M22 34c-4-1-7-2-5-4M26 28c-4-2-6-3-4-5M30 22c-3-2-5-4-3-6" stroke="#620725" strokeWidth="0.8" strokeLinecap="round" opacity="0.7" />
+      <path d="M34 38c3 2 5 2 4-1M38 32c4 1 6 0 5-3M42 26c4 0 6-2 4-4" stroke="#620725" strokeWidth="0.8" strokeLinecap="round" opacity="0.7" />
+      {/* Nib */}
+      <path d="M8 52c0 0 1 2 3 2s3-2 3-2l-3-2-3 2z" fill="#620725" opacity="0.3" />
+    </svg>
+  )
+}
+
+export function SparkleCluster({ className = '', size = 30 }) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Large sparkle */}
+      <path d="M20 8l1.5 7 7 1.5-7 1.5L20 25l-1.5-7-7-1.5 7-1.5L20 8z" fill="#620725" opacity="0.2" />
+      {/* Small sparkles */}
+      <circle cx="10" cy="12" r="1.5" fill="#620725" opacity="0.15" />
+      <circle cx="30" cy="15" r="1" fill="#620725" opacity="0.12" />
+      <circle cx="28" cy="28" r="1.5" fill="#620725" opacity="0.18" />
+      <circle cx="12" cy="30" r="1" fill="#620725" opacity="0.14" />
+    </svg>
+  )
+}
+
+export function RibbonBookmark({ className = '', size = 30, text = '' }) {
+  return (
+    <svg className={className} width={size} height={size * 2} viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 0h20v70l-10-8-10 8V0z" fill="#620725" opacity="0.85" />
+      <path d="M10 0h20v70l-10-8-10 8V0z" stroke="#8B1538" strokeWidth="1" opacity="0.6" />
+      {/* Decorative edge lines */}
+      <line x1="15" y1="5" x2="15" y2="60" stroke="#E2D5CA" strokeWidth="0.5" opacity="0.3" />
+      <line x1="25" y1="5" x2="25" y2="60" stroke="#E2D5CA" strokeWidth="0.5" opacity="0.3" />
+      {text && (
+        <text x="20" y="25" fontFamily="Montserrat, sans-serif" fontSize="8" fontWeight="700" fill="#E2D5CA" textAnchor="middle" opacity="0.8" transform="rotate(-90 20 25)">{text}</text>
+      )}
+    </svg>
+  )
+}

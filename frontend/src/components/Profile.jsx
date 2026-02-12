@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
 import { User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { DoodleRose, DoodleDivider, DoodleCherub } from './Doodles'
+import { DoodleRose, DoodleDivider, DoodleCherub, PaperFold, InkSplatter, QuillPen } from './Doodles'
+import { ShimmerButton, FloatingMiniHearts } from './RomanticEffects'
+import { mediumHaptic, lightHaptic } from '../lib/haptics'
 
 /* Inline heart SVG */
 const HeartIcon = ({ className = '', size = 16 }) => (
@@ -18,24 +20,48 @@ const ClockIcon = ({ className = '', size = 14 }) => (
 
 function Profile({ user, onLogout }) {
   const handleLogout = async () => {
+    mediumHaptic()
     await supabase.auth.signOut()
     if (onLogout) onLogout()
   }
 
+  const handleAvatarClick = () => {
+    lightHaptic()
+  }
+
   return (
     <div className="space-y-5">
-      <div className="card-elevated p-6 sm:p-8 relative">
+      <div className="card-elevated p-6 sm:p-8 relative vintage-paper">
+        {/* Paper fold corners */}
+        <div className="absolute top-0 right-0 pointer-events-none opacity-30">
+          <PaperFold size={36} corner="tr" />
+        </div>
+        <div className="absolute bottom-0 left-0 pointer-events-none opacity-20">
+          <PaperFold size={32} corner="bl" />
+        </div>
         {/* Corner doodle */}
         <div className="absolute top-4 right-4 opacity-15 pointer-events-none">
           <DoodleRose size={36} />
         </div>
+        {/* Ink splatters */}
+        <InkSplatter className="absolute top-20 left-10" size={35} variant={1} />
+        <InkSplatter className="absolute bottom-24 right-12" size={30} variant={2} />
 
         {/* Avatar + name */}
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-wine mx-auto mb-3 flex items-center justify-center ring-4 ring-wine/10">
-            <User strokeWidth={1} size={32} className="text-cream" />
-          </div>
-          <h2 className="font-script text-3xl text-wine mb-1">{user?.name || 'Student'}</h2>
+        <div className="text-center mb-6 relative">
+          <motion.div 
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleAvatarClick}
+            className="relative inline-block cursor-pointer">
+            <div className="w-20 h-20 rounded-full bg-wine mx-auto mb-3 flex items-center justify-center ring-4 ring-wine/10 shadow-cinematic relative">
+              <User strokeWidth={1} size={32} className="text-cream" />
+              {/* Glow pulse */}
+              <div className="absolute inset-0 rounded-full blur-xl bg-wine/30 scale-125 -z-10 glow-wine" />
+            </div>
+            <FloatingMiniHearts count={3} duration={1.5} />
+          </motion.div>
+          <h2 className="font-script text-3xl text-wine mb-1 dramatic-entrance">{user?.name || 'Student'}</h2>
           <p className="text-ink/40 font-sans text-xs">{user?.email || ''}</p>
           {user?.year && (
             <div className="flex items-center justify-center gap-1.5 mt-3 flex-wrap">
@@ -90,14 +116,12 @@ function Profile({ user, onLogout }) {
 
         {/* Logout */}
         <div className="border-t border-wine/6 pt-5">
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
+          <ShimmerButton
             onClick={handleLogout}
             className="btn-outline w-full text-xs"
           >
             Sign Out
-          </motion.button>
+          </ShimmerButton>
         </div>
       </div>
     </div>

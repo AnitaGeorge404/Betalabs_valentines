@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Clock, TrendingUp } from 'lucide-react'
 import { getCouplesLeaderboard, getUsersLeaderboard } from '../lib/api'
-import { DoodleDivider } from './Doodles'
+import { DoodleDivider, WaxSeal, InkSplatter, SparkleCluster, VintageStamp } from './Doodles'
+import { RomanticCard, staggerVariants, staggerItemVariants } from './RomanticEffects'
+import { lightHaptic } from '../lib/haptics'
 
 /* Inline SVG icons to match editorial theme */
 const HeartIcon = ({ className = '', size = 16 }) => (
@@ -79,13 +81,14 @@ function Leaderboard() {
       {/* Tab Switcher */}
       <div className="bg-cream/80 rounded-organic p-1 flex gap-1 border border-wine/6">
         {[
+
           { id: 'couples', label: 'Top Couples', Icon: HeartIcon },
           { id: 'users', label: 'Top Matchers', Icon: StarIcon },
         ].map(({ id, label, Icon }) => (
           <motion.button
             key={id}
             whileTap={{ scale: 0.97 }}
-            onClick={() => setActiveTab(id)}
+            onClick={() => { lightHaptic(); setActiveTab(id); }}
             className={`flex-1 py-2.5 rounded-[0.9rem] font-sans font-semibold text-xs tracking-wide transition-all flex items-center justify-center gap-1.5 ${
               activeTab === id
                 ? 'bg-wine text-cream shadow-editorial'
@@ -111,10 +114,20 @@ function Leaderboard() {
       {/* ---- Couples ---- */}
       {activeTab === 'couples' && (
         <>
-          <div className="card-elevated p-5 sm:p-7">
-            <div className="text-center mb-6">
-              <TrophyIcon className="text-wine mx-auto mb-2" size={28} />
-              <h3 className="font-serif text-2xl text-wine mb-1">Most Matched Couples</h3>
+          <div className="card-elevated p-5 sm:p-7 shadow-cinematic">
+            <div className="text-center mb-6 relative">
+              <motion.div
+                animate={{ 
+                  y: [-2, 2, -2],
+                  rotate: [-3, 3, -3]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative inline-block"
+              >
+                <TrophyIcon className="text-wine mx-auto mb-2" size={28} />
+                <div className="absolute inset-0 blur-xl bg-wine/20 rounded-full scale-150" />
+              </motion.div>
+              <h3 className="font-serif text-2xl text-wine mb-1 text-reveal">Most Matched Couples</h3>
               <p className="text-ink/40 font-sans text-xs">Couples matched the most by the community</p>
             </div>
 
@@ -125,14 +138,25 @@ function Leaderboard() {
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {top3Couples.map((couple, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -4, boxShadow: '0 12px 40px rgba(98,7,37,0.1)' }}
-                    className="bg-cream border border-wine/10 rounded-organic p-5 text-center relative"
+                <RomanticCard
+                  key={index}
+                  showHearts={index === 0}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ boxShadow: '0 12px 40px rgba(98,7,37,0.1)' }}
+                    className="bg-cream border border-wine/10 rounded-organic p-5 text-center relative vintage-paper"
                   >
+                    {/* Wax seal for #1 */}
+                    {index === 0 && (
+                      <div className="absolute -top-4 -right-4 wax-seal-float">
+                        <WaxSeal size={44} />
+                      </div>
+                    )}
+                    {/* Sparkles for top 3 */}
+                    {index < 3 && (
+                      <SparkleCluster className="absolute top-2 right-2" size={20} />
+                    )}
                     {/* Rank numeral */}
                     <span className="absolute top-3 left-4 font-serif text-[0.65rem] text-wine/30 tracking-wider">
                       {RANK_LABELS[index]}
@@ -156,7 +180,7 @@ function Leaderboard() {
                         <span className="text-ink font-bold font-sans">{couple.score}%</span>
                       </div>
                     </div>
-                  </motion.div>
+                  </RomanticCard>
                 ))}
               </div>
             )}

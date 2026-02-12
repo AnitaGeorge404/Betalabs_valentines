@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from './lib/supabase'
 import { registerUser, checkUser } from './lib/api'
 import { FloatingHearts } from './components/FloatingHearts'
+import { ParticleField } from './components/ParticleField'
 import { AuthPage } from './components/AuthPage'
 import { OnboardingPage } from './components/OnboardingPage'
 import { QuizPage } from './components/QuizPage'
 import { MatchFinder } from './components/MatchFinder'
 import { Leaderboard } from './components/Leaderboard'
 import { Profile } from './components/Profile'
+import { LottieAccent } from './components/LottieAccent'
 import './App.css'
 
 /* ─── inline SVG nav icons (hand-drawn doodle feel) ─── */
@@ -116,14 +118,28 @@ function App() {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 z-20 bg-parchment/90 backdrop-blur-md border-b border-wine/8"
+        className="sticky top-0 z-20 bg-parchment/95 backdrop-blur-xl border-b border-wine/8 shadow-cinematic"
+        style={{ boxShadow: '0 4px 24px rgba(98,7,37,0.12), 0 8px 48px rgba(98,7,37,0.08)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <HeartLogo />
-              <h1 className="font-script text-2xl sm:text-3xl text-wine tracking-wide">Cupid's Ledger</h1>
-            </div>
+            <motion.div 
+              className="flex items-center gap-2"
+              whileHover={{ scale: 1.02 }}
+            >
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.08, 1],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="relative"
+              >
+                <HeartLogo />
+                <div className="absolute inset-0 blur-lg bg-wine/20 rounded-full scale-125 -z-10" />
+              </motion.div>
+              <h1 className="font-script text-2xl sm:text-3xl text-wine tracking-wide drop-shadow-sm">Cupid's Ledger</h1>
+            </motion.div>
             <div className="flex items-center gap-2.5">
               {userData?.score != null && (
                 <div className="flex items-center gap-1 bg-wine/6 rounded-full px-2.5 py-1">
@@ -217,6 +233,9 @@ function App() {
   return (
     <div className="min-h-screen bg-parchment relative overflow-hidden">
       <FloatingHearts />
+      <ParticleField particleCount={36} />
+      <LottieAccent className="absolute top-20 left-2 sm:left-6 opacity-45 z-[1]" size={82} />
+      <LottieAccent className="absolute top-44 right-1 sm:right-5 opacity-40 z-[1]" size={96} />
       <div className="relative z-10">
         <AnimatePresence mode="wait">
           {currentPage === 'auth' && <AuthPage key="auth" />}

@@ -7,21 +7,25 @@
 /* ---- Falling Heart Animation (Slow Drift) ---- */
 @keyframes driftDown {
   0% {
-    transform: translateY(-5vh) translateX(0) rotate(var(--start-rot, 0deg));
+    transform: translateY(-5vh) translateX(0) rotate(var(--start-rot, 0deg)) scale(0.8);
     opacity: 0;
+    filter: blur(2px);
   }
   8% {
     opacity: var(--heart-opacity, 0.6);
+    filter: blur(0);
   }
   50% {
-    transform: translateY(50vh) translateX(var(--sway, 20px)) rotate(calc(var(--start-rot, 0deg) + 15deg));
+    transform: translateY(50vh) translateX(var(--sway, 20px)) rotate(calc(var(--start-rot, 0deg) + 15deg)) scale(1);
   }
   88% {
     opacity: var(--heart-opacity, 0.6);
+    filter: blur(0);
   }
   100% {
-    transform: translateY(105vh) translateX(calc(var(--sway, 20px) * -0.5)) rotate(calc(var(--start-rot, 0deg) + 25deg));
+    transform: translateY(105vh) translateX(calc(var(--sway, 20px) * -0.5)) rotate(calc(var(--start-rot, 0deg) + 25deg)) scale(0.9);
     opacity: 0;
+    filter: blur(1px);
   }
 }
 

@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import { DoodleEnvelope, DoodleKey, DoodleCherub, DoodleDivider } from './Doodles'
+import { ShimmerButton } from './RomanticEffects'
+import { lightHaptic, mediumHaptic } from '../lib/haptics'
+import { LottieAccent } from './LottieAccent'
 
 const onboardingSteps = [
   {
@@ -30,8 +33,8 @@ function OnboardingPage({ onComplete }) {
   const current = onboardingSteps[step]
   const DoodleIcon = current.Doodle
 
-  const goNext = () => { setDir(1); setStep(s => s + 1) }
-  const goPrev = () => { setDir(-1); setStep(s => s - 1) }
+  const goNext = () => { lightHaptic(); setDir(1); setStep(s => s + 1) }
+  const goPrev = () => { lightHaptic(); setDir(-1); setStep(s => s - 1) }
 
   const variants = {
     enter: (d) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
@@ -46,6 +49,8 @@ function OnboardingPage({ onComplete }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-6"
     >
+      <LottieAccent className="absolute top-6 right-6 opacity-50" size={78} />
+
       <div className="card-elevated px-8 sm:px-12 py-10 sm:py-14 max-w-xl w-full relative overflow-hidden">
         {/* Subtle corner decoration */}
         <div className="absolute top-4 right-4 opacity-[0.06]">
@@ -124,15 +129,13 @@ function OnboardingPage({ onComplete }) {
               <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-cream" />
             </motion.button>
           ) : (
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={onComplete}
+            <ShimmerButton
+              onClick={() => { mediumHaptic(); onComplete(); }}
               className="btn-wine rounded-xl px-7 py-3 font-sans font-semibold text-sm flex items-center gap-2 tracking-wide"
             >
               Begin Quiz
               <ArrowRight strokeWidth={1.5} className="w-4 h-4" />
-            </motion.button>
+            </ShimmerButton>
           )}
         </div>
       </div>

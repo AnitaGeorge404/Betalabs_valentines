@@ -2,12 +2,16 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { DoodleEnvelope, DoodleCherub, DoodleBow, DoodleRose } from './Doodles'
+import { ShimmerButton } from './RomanticEffects'
+import { LottieAccent } from './LottieAccent'
+import { mediumHaptic } from '../lib/haptics'
 
 function AuthPage({ onAuth }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const handleGoogleSignIn = async () => {
+    mediumHaptic()
     setLoading(true)
     setError(null)
     try {
@@ -34,6 +38,9 @@ function AuthPage({ onAuth }) {
       exit={{ opacity: 0 }}
       className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
     >
+      <LottieAccent className="absolute -top-6 -right-5 sm:right-4 opacity-70" size={92} />
+      <LottieAccent className="absolute bottom-8 -left-3 sm:left-4 opacity-55" size={74} />
+
       {/* Corner doodles — fixed, subtle */}
       <DoodleCherub className="absolute top-6 left-6 opacity-10 hidden sm:block" size={90} />
       <DoodleRose className="absolute bottom-8 right-8 opacity-10 hidden sm:block" size={70} />
@@ -85,9 +92,20 @@ function AuthPage({ onAuth }) {
 
           <div className="text-center relative z-10">
             {/* Title */}
-            <h1 className="font-script text-4xl sm:text-5xl text-wine leading-tight mb-1">
+            <motion.h1 
+              className="font-script text-4xl sm:text-5xl text-wine leading-tight mb-1 dramatic-entrance relative inline-block"
+              animate={{ 
+                textShadow: [
+                  '0 2px 12px rgba(98,7,37,0.2)',
+                  '0 4px 24px rgba(98,7,37,0.3)',
+                  '0 2px 12px rgba(98,7,37,0.2)'
+                ]
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
               Cupid's Ledger
-            </h1>
+              <div className="absolute inset-0 blur-2xl bg-wine/10 -z-10" />
+            </motion.h1>
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="h-px w-10 bg-wine/15" />
               <span className="font-serif text-[0.7rem] tracking-[0.25em] uppercase text-wine/40">
@@ -107,9 +125,7 @@ function AuthPage({ onAuth }) {
             )}
 
             {/* Google Sign-In — styled as wax-sealed invitation */}
-            <motion.button
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
+            <ShimmerButton
               onClick={handleGoogleSignIn}
               disabled={loading}
               className="w-full btn-wine rounded-xl px-6 py-4 flex items-center justify-center gap-3 disabled:opacity-50"
@@ -118,7 +134,7 @@ function AuthPage({ onAuth }) {
               <span className="font-sans font-semibold text-cream text-sm tracking-wide">
                 {loading ? 'Opening the ledger...' : 'Open with Google'}
               </span>
-            </motion.button>
+            </ShimmerButton>
 
             <p className="mt-5 text-xs text-ink/35 font-sans tracking-wide">
               Only <span className="text-wine/50 font-medium">@iiitkottayam.ac.in</span> addresses

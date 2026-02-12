@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, User, X, Clock } from 'lucide-react'
 import { searchUsers, makeMatch, getCooldown } from '../lib/api'
-import { DoodleLock, DoodleKey, DoodleDivider } from './Doodles'
+import { DoodleLock, DoodleKey, DoodleDivider, InkSplatter, QuillPen } from './Doodles'
+import { RomanticCard, ShimmerButton, FloatingMiniHearts } from './RomanticEffects'
+import { mediumHaptic, celebrationHaptic, selectionHaptic, heartbeatHaptic } from '../lib/haptics'
 
 function formatBatchYear(user) {
   if (!user?.year) return ''
@@ -82,17 +84,23 @@ function MatchFinder({ userEmail, onMatchComplete }) {
   }, [])
 
   const selectPerson = useCallback((student) => {
+    selectionHaptic()
     if (!selectedPerson1) setSelectedPerson1(student)
-    else if (!selectedPerson2) setSelectedPerson2(student)
+    else if (!selectedPerson2) {
+      setSelectedPerson2(student)
+      heartbeatHaptic()
+    }
     setSearchQuery(''); setSuggestions([]); setShowDropdown(false)
   }, [selectedPerson1, selectedPerson2])
 
   const handleMatch = async () => {
     if (!selectedPerson1 || !selectedPerson2 || cooldownRemaining > 0) return
+    mediumHaptic()
     setMatching(true); setError(null); setMatchResult(null)
     try {
       const result = await makeMatch(selectedPerson1.email, selectedPerson2.email, userEmail)
       setMatchResult(result); setCooldownRemaining(180)
+      celebrationHaptic()
       if (onMatchComplete) onMatchComplete()
     } catch (err) {
       if (err.message?.includes('Cooldown')) {
@@ -104,6 +112,7 @@ function MatchFinder({ userEmail, onMatchComplete }) {
   }
 
   const clearSelection = () => {
+    mediumHaptic()
     setSelectedPerson1(null); setSelectedPerson2(null); setMatchResult(null); setError(null)
   }
 
@@ -117,21 +126,46 @@ function MatchFinder({ userEmail, onMatchComplete }) {
       <AnimatePresence>
         {matchResult && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            className="card-elevated p-6 sm:p-8 text-center relative overflow-hidden"
+            initial={{ opacity: 0, scale: 0.8, rotateX: 20 }}
+            animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ type: 'spring', bounce: 0.5, duration: 0.8 }}
+            className="card-elevated p-6 sm:p-8 text-center relative overflow-hidden shadow-cinematic"
           >
+            {/* Confetti particles */}
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0, y: 0 }}
+                animate={{ 
+                  opacity: [0, 1, 1, 0],
+                  scale: [0, 1, 1, 0.8],
+                  y: [-20, -80, -120, -160],
+                  x: [0, (Math.random() - 0.5) * 100],
+                  rotate: [0, Math.random() * 360]
+                }}
+                transition={{ duration: 2, delay: i * 0.1, ease: 'easeOut' }}
+                className="absolute left-1/2 bottom-1/2 w-2 h-2 rounded-full z-50"
+                style={{ 
+                  background: i % 3 === 0 ? '#620725' : i % 3 === 1 ? '#910D28' : '#B76E79',
+                  pointerEvents: 'none'
+                }}
+              />
+            ))}
+            
             {/* Decorative corners */}
             <DoodleKey className="absolute top-3 left-3 opacity-[0.07]" size={40} />
             <DoodleLock className="absolute bottom-3 right-3 opacity-[0.07]" size={35} />
 
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="relative inline-block mb-4"
             >
-              <HeartIcon className="text-wine mx-auto mb-3" size={36} filled />
+              <HeartIcon className="text-wine mx-auto" size={48} filled />
+              <div className="absolute inset-0 blur-xl bg-wine/40 rounded-full scale-150 glow-wine -z-10" />
             </motion.div>
+            
             <h3 className="font-script text-3xl text-wine mb-1">Match Score</h3>
             <p className="text-5xl font-bold text-wine font-serif mb-2">
               {matchResult.score}%
@@ -203,7 +237,7 @@ function MatchFinder({ userEmail, onMatchComplete }) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
                 disabled={selectedPerson1 && selectedPerson2}
-                className="w-full input-ledger disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full input-ledger disabled:opacity-40 disabled:cursor-not-allowed quill-cursor"
               />
               {searching && (
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -224,9 +258,12 @@ function MatchFinder({ userEmail, onMatchComplete }) {
                   exit={{ opacity: 0, y: -4 }}
                   className="absolute z-30 top-full mt-2 w-full bg-cream rounded-organic shadow-editorial-lg border border-wine/8 max-h-56 overflow-y-auto"
                 >
-                  {suggestions.map((student) => (
-                    <button
+                  {suggestions.map((student, idx) => (
+                    <motion.button
                       key={student.email}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.03 }}
                       onClick={() => selectPerson(student)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-wine/[0.03] transition-colors first:rounded-t-organic last:rounded-b-organic text-left"
                     >
@@ -237,7 +274,7 @@ function MatchFinder({ userEmail, onMatchComplete }) {
                         <p className="font-sans text-sm font-semibold text-ink truncate">{student.name}</p>
                         <p className="font-sans text-[0.65rem] text-ink/40 truncate">{formatBatchYear(student)}</p>
                       </div>
-                    </button>
+                    </motion.button>
                   ))}
                 </motion.div>
               )}
@@ -247,8 +284,9 @@ function MatchFinder({ userEmail, onMatchComplete }) {
           {/* Two selection cards */}
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Person 1 */}
-            <motion.div
+            <RomanticCard
               layout
+              showHearts={!!selectedPerson1}
               className={`flex-1 rounded-organic border p-4 sm:p-5 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
                 selectedPerson1
                   ? 'border-wine/20 bg-wine/[0.03]'
@@ -275,7 +313,7 @@ function MatchFinder({ userEmail, onMatchComplete }) {
                   <p className="font-sans text-xs">Person 1</p>
                 </div>
               )}
-            </motion.div>
+            </RomanticCard>
 
             {/* Heart / X connector */}
             <div className="flex-shrink-0">
@@ -289,8 +327,9 @@ function MatchFinder({ userEmail, onMatchComplete }) {
             </div>
 
             {/* Person 2 */}
-            <motion.div
+            <RomanticCard
               layout
+              showHearts={!!selectedPerson2}
               className={`flex-1 rounded-organic border p-4 sm:p-5 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
                 selectedPerson2
                   ? 'border-crimson/20 bg-crimson/[0.03]'
@@ -317,13 +356,11 @@ function MatchFinder({ userEmail, onMatchComplete }) {
                   <p className="font-sans text-xs">Person 2</p>
                 </div>
               )}
-            </motion.div>
+            </RomanticCard>
           </div>
 
           {/* Match button */}
-          <motion.button
-            whileHover={canMatch ? { scale: 1.02 } : {}}
-            whileTap={canMatch ? { scale: 0.98 } : {}}
+          <ShimmerButton
             onClick={handleMatch}
             disabled={!canMatch || matching}
             className={`w-full py-4 rounded-xl font-sans font-bold text-sm flex items-center justify-center gap-2 transition-all ${
@@ -340,7 +377,7 @@ function MatchFinder({ userEmail, onMatchComplete }) {
               : !selectedPerson1 || !selectedPerson2
               ? 'Select two people to match'
               : 'Write this match into the Ledger'}
-          </motion.button>
+          </ShimmerButton>
         </div>
       )}
 

@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getQuestions, submitAnswers } from '../lib/api'
-import { DoodleDivider } from './Doodles'
+import { DoodleDivider, SparkleCluster, InkSplatter } from './Doodles'
+import { mediumHaptic, lightHaptic, successHaptic } from '../lib/haptics'
 
 function shuffleArray(arr) {
   const shuffled = [...arr]
@@ -147,7 +148,7 @@ function QuizPage({ userEmail, onComplete }) {
           <motion.button
             whileHover={canProceed ? { scale: 1.02, y: -1 } : {}}
             whileTap={canProceed ? { scale: 0.98 } : {}}
-            onClick={() => canProceed && setPhase('quiz')}
+            onClick={() => { if (canProceed) { mediumHaptic(); setPhase('quiz'); } }}
             disabled={!canProceed}
             className={`w-full py-4 rounded-xl font-sans font-bold text-sm flex items-center justify-center gap-2 transition-all ${
               canProceed
@@ -172,10 +173,12 @@ function QuizPage({ userEmail, onComplete }) {
   const totalSteps = shuffledQuestions.length
 
   const handleRatingChange = (value) => {
+    mediumHaptic()
     setAnswers({ ...answers, [String(question.qid)]: parseFloat(value) })
   }
 
   const handleNext = async () => {
+    lightHaptic()
     if (currentIdx < totalSteps - 1) {
       setDirection(1)
       setCurrentIdx(currentIdx + 1)
@@ -183,6 +186,7 @@ function QuizPage({ userEmail, onComplete }) {
       setSubmitting(true)
       try {
         await submitAnswers(userEmail, answers, gender, preference)
+        successHaptic()
         onComplete()
       } catch (err) {
         setError(err.message)
@@ -192,6 +196,7 @@ function QuizPage({ userEmail, onComplete }) {
   }
 
   const handlePrev = () => {
+    lightHaptic()
     if (currentIdx > 0) {
       setDirection(-1)
       setCurrentIdx(currentIdx - 1)
